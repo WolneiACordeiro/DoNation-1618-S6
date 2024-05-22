@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: donation
+  neo4j:
+    uri: ${AURA_URI}
+    authentication:
+      username: ${AURA_USER}
+      password: ${AURA_PASSWORD}
+    security:
+      encrypted: true
