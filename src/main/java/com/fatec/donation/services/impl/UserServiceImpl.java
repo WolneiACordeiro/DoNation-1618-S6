@@ -7,23 +7,16 @@ import com.fatec.donation.domain.entity.User;
 import com.fatec.donation.domain.request.CreateUserRequest;
 import com.fatec.donation.repository.UserRepository;
 import com.fatec.donation.services.UserService;
-import feign.Feign;
-import feign.gson.GsonDecoder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Collections;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-
-    CursedWordsService client = Feign.builder()
-            .decoder(new GsonDecoder())
-            .target(CursedWordsService.class, "http://10.67.56.204:5000");
+    private final CursedWordsService cursedWordsService;
 
     public User createUser(CreateUserRequest request){
         User user = new User();
@@ -33,7 +26,7 @@ public class UserServiceImpl implements UserService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         CursedWord requestData = new CursedWord();
         requestData.setText(request.getUsername());
-        ResponseData responseData = client.postEndpointData(requestData);
+        ResponseData responseData = cursedWordsService.postEndpointData(requestData);
         boolean isTextInappropriate = responseData.getInappropriate();
         System.out.println("Inappropriate: " + isTextInappropriate);
 
