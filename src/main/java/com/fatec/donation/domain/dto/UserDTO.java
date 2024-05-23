@@ -1,0 +1,15 @@
+package com.fatec.donation.domain.dto;
+
+import com.fatec.donation.domain.enums.Roles;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+import java.util.Set;
+
+@AllArgsConstructor
+@Getter
+public class UserDTO {
+    private String name;
+    private String username;
+    private Set<Roles> roles;
+}
