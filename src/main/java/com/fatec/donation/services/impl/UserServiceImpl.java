@@ -11,6 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -24,13 +27,22 @@ public class UserServiceImpl implements UserService {
         user.setUsername(request.getUsername());
         user.setRoles(request.getRoles());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        CursedWord requestData = new CursedWord();
-        requestData.setText(request.getUsername());
-        ResponseData responseData = cursedWordsService.postEndpointData(requestData);
-        boolean isTextInappropriate = responseData.getInappropriate();
-        System.out.println("Inappropriate: " + isTextInappropriate);
 
-        userRepository.save(user);
+        List<String> wordsToCheck = Arrays.asList(request.getName(), request.getUsername());
+        boolean isAnyWordInappropriate = wordsToCheck.parallelStream()
+                .map(word -> {
+                    CursedWord requestData = new CursedWord();
+                    requestData.setText(word);
+                    ResponseData responseData = cursedWordsService.postEndpointData(requestData);
+                    return responseData.getInappropriate();
+                })
+                .anyMatch(b -> b == true);
+
+        System.out.println("Inappropriate: " + isAnyWordInappropriate);
+
+        if (!isAnyWordInappropriate) {
+            userRepository.save(user);
+        }
 
         return user;
     }
