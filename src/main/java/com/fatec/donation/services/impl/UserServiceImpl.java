@@ -1,6 +1,7 @@
 package com.fatec.donation.services.impl;
 
 import com.fatec.donation.client.CursedWordsService;
+import com.fatec.donation.domain.dto.UserDTO;
 import com.fatec.donation.domain.entity.AccessToken;
 import com.fatec.donation.domain.entity.User;
 import com.fatec.donation.domain.request.CreateUserRequest;
@@ -9,6 +10,7 @@ import com.fatec.donation.repository.UserRepository;
 import com.fatec.donation.services.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -68,6 +70,11 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
 
         return user;
+    }
+
+    public ResponseEntity<UserDTO> getUserProfile(Long userId) {
+        UserDTO user = userRepository.findUserById(userId);
+        return ResponseEntity.ok(user);
     }
 
     public Long getUserIdByJwt() {

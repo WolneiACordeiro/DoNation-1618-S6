@@ -44,6 +44,7 @@ public class SecurityConfig {
                     auth.requestMatchers(HttpMethod.POST, "/api/v1/user/register").permitAll();
                     auth.requestMatchers(HttpMethod.GET, "/api/v1/user/user-id").permitAll();
                     auth.requestMatchers(HttpMethod.POST, "/api/analyze-text").authenticated();
+                    auth.requestMatchers(HttpMethod.GET, "/api/profile").authenticated();
                     auth.anyRequest().authenticated();
                 })
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)

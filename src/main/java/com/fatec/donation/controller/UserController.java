@@ -33,26 +33,38 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity<UserDTO> signUp(@RequestBody CreateUserRequest request){
         User user = userService.createUser(request);
-        UserDTO responseUser = new UserDTO(user.getName(), user.getUsername(), user.getRoles());
+        UserDTO responseUser = new UserDTO(user.getName(), user.getUsername(), user.getEmail(), user.getRoles());
         return new ResponseEntity<>(responseUser, HttpStatus.CREATED);
     }
 
-    @GetMapping("/user-id")
-    public String getUserId(HttpServletRequest request) {
+    @GetMapping("/profile")
+    public ResponseEntity<UserDTO> getUserProfile(HttpServletRequest request) {
         String token = JwtService.extractTokenFromRequest(request);
-        if (token != null) {
             try {
                 Long userId = userService.getUserIdByJwt();
-                log.info("User ID: {}", userId);
-                return "User ID: " + userId;
+                return userService.getUserProfile(userId);
             } catch (Exception e) {
-                log.error("Invalid token: {}", e.getMessage());
-                return "Invalid token";
+                log.error("Error retrieving user profile: {}", e.getMessage());
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
             }
-        } else {
-            log.error("No token found in request");
-            return "No token found in request";
         }
-    }
+
+//    @GetMapping("/user-id")
+//    public String getUserId(HttpServletRequest request) {
+//        String token = JwtService.extractTokenFromRequest(request);
+//        if (token != null) {
+//            try {
+//                Long userId = userService.getUserIdByJwt();
+//                log.info("User ID: {}", userId);
+//                return "User ID: " + userId;
+//            } catch (Exception e) {
+//                log.error("Invalid token: {}", e.getMessage());
+//                return "Invalid token";
+//            }
+//        } else {
+//            log.error("No token found in request");
+//            return "No token found in request";
+//        }
+//    }
 
 }
