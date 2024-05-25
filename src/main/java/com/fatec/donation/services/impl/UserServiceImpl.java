@@ -1,15 +1,18 @@
 package com.fatec.donation.services.impl;
 
 import com.fatec.donation.client.CursedWordsService;
-import com.fatec.donation.domain.entity.CursedWord;
-import com.fatec.donation.domain.entity.ResponseData;
+import com.fatec.donation.domain.entity.AccessToken;
 import com.fatec.donation.domain.entity.User;
 import com.fatec.donation.domain.request.CreateUserRequest;
+import com.fatec.donation.jwt.JwtService;
 import com.fatec.donation.repository.UserRepository;
 import com.fatec.donation.services.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -17,22 +20,61 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final CursedWordsService cursedWordsService;
+    private final JwtService jwtService;
+    private final HttpServletRequest request;
+
+    public User getByEmail(String email) {
+        return userRepository.findUserByEmail(email);
+    }
+
+    @Override
+    public AccessToken authenticate(String email, String password) {
+        var user = getByEmail(email);
+        if(user == null){
+            return null;
+        }
+        boolean matches = passwordEncoder.matches(password, user.getPassword());
+        if(matches){
+            return jwtService.generateToken(user);
+        }
+        return null;
+    }
 
     public User createUser(CreateUserRequest request){
         User user = new User();
         user.setName(request.getName());
         user.setUsername(request.getUsername());
-        user.setRoles(request.getRoles());
+        user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        CursedWord requestData = new CursedWord();
-        requestData.setText(request.getUsername());
-        ResponseData responseData = cursedWordsService.postEndpointData(requestData);
-        boolean isTextInappropriate = responseData.getInappropriate();
-        System.out.println("Inappropriate: " + isTextInappropriate);
+        user.setCreatedAt(LocalDateTime.now());
+        user.setRoles(request.getRoles());
+
+//        List<String> wordsToCheck = Arrays.asList(request.getName(), request.getUsername());
+//        boolean isAnyWordInappropriate = wordsToCheck.parallelStream()
+//                .map(word -> {
+//                    CursedWord requestData = new CursedWord();
+//                    requestData.setText(word);
+//                    ResponseData responseData = cursedWordsService.postEndpointData(requestData);
+//                    return responseData.getInappropriate();
+//                })
+//                .anyMatch(b -> b == true);
+//
+//        System.out.println("Inappropriate: " + isAnyWordInappropriate);
+
+//        if (!isAnyWordInappropriate) {
+//            userRepository.save(user);
+//        }
 
         userRepository.save(user);
 
         return user;
+    }
+
+    public Long getUserIdByJwt() {
+        String token = JwtService.extractTokenFromRequest(request);
+        String email = jwtService.getEmailFromToken(token);
+        User user = userRepository.findUserByEmail(email);
+        return user.getId();
     }
 
 }

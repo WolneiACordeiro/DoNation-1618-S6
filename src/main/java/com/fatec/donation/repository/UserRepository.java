@@ -10,6 +10,7 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends Neo4jRepository<User, Long> {
     Optional<User> findUserByUsername(String username);
+    User findUserByEmail(String email);
     @Query("MATCH (user:User), (course:Course) WHERE user.username = $username AND course.identifier = $identifier " +
             "RETURN EXISTS((user)-[:ENROLLED_IN]->(course))")
     Boolean findEnrolmentStatus(String username, String identifier);
