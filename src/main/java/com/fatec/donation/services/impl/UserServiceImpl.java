@@ -1,9 +1,11 @@
 package com.fatec.donation.services.impl;
 
 import com.fatec.donation.client.CursedWordsService;
+import com.fatec.donation.domain.dto.CompleteUserDTO;
 import com.fatec.donation.domain.dto.UserDTO;
 import com.fatec.donation.domain.entity.AccessToken;
 import com.fatec.donation.domain.entity.User;
+import com.fatec.donation.domain.request.CompleteUserRequest;
 import com.fatec.donation.domain.request.CreateUserRequest;
 import com.fatec.donation.jwt.JwtService;
 import com.fatec.donation.repository.UserRepository;
@@ -15,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -47,6 +50,7 @@ public class UserServiceImpl implements UserService {
         user.setName(request.getName());
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
+        user.setFirstAccess(true);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setCreatedAt(LocalDateTime.now());
         user.setRoles(request.getRoles());
@@ -72,12 +76,28 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
-    public ResponseEntity<UserDTO> getUserProfile(Long userId) {
-        UserDTO user = userRepository.findUserById(userId);
+    public User completeInfosUser(CompleteUserRequest request, UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
+
+        user.setPhone(request.getPhone());
+        user.setBirthday(request.getBirthday());
+        user.setState(request.getState());
+        user.setCity(request.getCity());
+        user.setTags(request.getTags());
+        user.setFirstAccess(false);
+
+        userRepository.save(user);
+
+        return user;
+    }
+
+    public ResponseEntity<UserDTO> getUserProfile(UUID userId) {
+        UserDTO user = userRepository.findUserDTOById(userId);
         return ResponseEntity.ok(user);
     }
 
-    public Long getUserIdByJwt() {
+    public UUID getUserIdByJwt() {
         String token = JwtService.extractTokenFromRequest(request);
         String email = jwtService.getEmailFromToken(token);
         User user = userRepository.findUserByEmail(email);

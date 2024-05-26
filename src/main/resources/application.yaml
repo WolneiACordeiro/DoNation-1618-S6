@@ -2,9 +2,9 @@ spring:
   application:
     name: donation
   neo4j:
-    uri: ${AURA_URI}
+    uri: neo4j+s://66522652.databases.neo4j.io
     authentication:
-      username: ${AURA_USER}
-      password: ${AURA_PASSWORD}
+      username: neo4j
+      password:
     security:
       encrypted: true

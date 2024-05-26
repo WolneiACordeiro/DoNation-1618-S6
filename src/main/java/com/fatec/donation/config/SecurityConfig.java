@@ -42,9 +42,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers(HttpMethod.POST,"/api/v1/user/auth").permitAll();
                     auth.requestMatchers(HttpMethod.POST, "/api/v1/user/register").permitAll();
-                    auth.requestMatchers(HttpMethod.GET, "/api/v1/user/user-id").permitAll();
-                    auth.requestMatchers(HttpMethod.POST, "/api/analyze-text").authenticated();
-                    auth.requestMatchers(HttpMethod.GET, "/api/profile").authenticated();
+                    auth.requestMatchers(HttpMethod.GET, "/api/v1/user/profile").authenticated();
+                    auth.requestMatchers(HttpMethod.PUT, "/api/v1/user/complete-register").authenticated();
+                    auth.requestMatchers(HttpMethod.POST, "/api/v1/groups/create").authenticated();
                     auth.anyRequest().authenticated();
                 })
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
