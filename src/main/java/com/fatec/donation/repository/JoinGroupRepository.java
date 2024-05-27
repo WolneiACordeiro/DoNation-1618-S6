@@ -1,8 +1,6 @@
 package com.fatec.donation.repository;
 
-import com.fatec.donation.domain.entity.Group;
 import com.fatec.donation.domain.entity.JoinGroup;
-import com.fatec.donation.domain.entity.User;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.neo4j.repository.query.Query;
 
@@ -18,5 +16,13 @@ public interface JoinGroupRepository extends Neo4jRepository<JoinGroup, UUID> {
     @Query("MATCH (user:User {id: $user})<-[:OWNER]-(group:Group {id: $group}) " +
             "RETURN COUNT(group) > 0 AS exists")
     boolean ownerByUserIdAndGroupId(UUID user, UUID group);
+
+    @Query("MATCH (:JoinRequest {id: $joinRequest})-[:FOR_GROUP]->(group:Group) " +
+            "RETURN group.id AS groupId")
+    UUID findGroupIdByJoinRequestId(UUID joinRequest);
+
+    @Query("MATCH (:JoinRequest {id: $joinRequest})-[:REQUESTED_BY]->(user:User) " +
+            "RETURN user.id AS userId")
+    UUID findUserIdByJoinRequestId(UUID joinRequest);
 
 }

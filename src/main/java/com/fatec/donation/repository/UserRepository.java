@@ -21,7 +21,4 @@ public interface UserRepository extends Neo4jRepository<User, UUID> {
     Boolean findEnrolmentStatus(String username, String identifier);
     CompleteUserDTO findCompleteUserDTOById(UUID io);
 
-//    @Query("MATCH (user:User), (course:Course) WHERE user.username = $username AND course.identifier = $identifier " +
-//            "CREATE (user)-[:ENROLLED_IN]->(course) RETURN user, course")
-//    CourseEnrolmentQueryResult createEnrolmentRelationship(String username, String identifier);
 }

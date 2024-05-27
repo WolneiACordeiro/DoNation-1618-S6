@@ -18,6 +18,8 @@ import org.neo4j.exceptions.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -92,10 +94,26 @@ public class GroupServiceImpl implements GroupService {
     public void acceptJoinRequest(UUID requestId) {
         JoinGroup joinRequest = joinGroupRepository.findById(requestId)
                 .orElseThrow(() -> new EntityNotFoundException("Solicitação não encontrada"));
+
         UUID userId = userService.getUserIdByJwt();
-        if (!joinRequest.getGroup().getOwner().getId().equals(userId)) {
+        UUID groupId = joinGroupRepository.findGroupIdByJoinRequestId(requestId);
+        UUID memberId = joinGroupRepository.findUserIdByJoinRequestId(requestId);
+
+        if (!joinGroupRepository.ownerByUserIdAndGroupId(userId, groupId)) {
             throw new UnauthorizedException("Você não tem permissão para aceitar/rejeitar esta solicitação");
         }
+
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new EntityNotFoundException("Grupo não encontrado"));
+
+        User member = userRepository.findById(memberId)
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
+
+        group.getMember().add(member);
+
+        joinGroupRepository.deleteById(requestId);
+
+        groupRepository.save(group);
     }
 
 }

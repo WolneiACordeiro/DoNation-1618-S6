@@ -9,6 +9,7 @@ import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Relationship;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -25,6 +26,8 @@ public class Group {
     private LocalDateTime createdAt;
     @Relationship(type = "OWNER", direction = Relationship.Direction.OUTGOING)
     private User owner;
+    @Relationship(type = "MEMBER", direction = Relationship.Direction.INCOMING)
+    private Set<User> member;
     public Group() {
         this.id = UUID.randomUUID();
     }
