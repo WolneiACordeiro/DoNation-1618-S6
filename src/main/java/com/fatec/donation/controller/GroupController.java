@@ -1,7 +1,6 @@
 package com.fatec.donation.controller;
 
 import com.fatec.donation.domain.dto.GroupDTO;
-import com.fatec.donation.domain.entity.Group;
 import com.fatec.donation.domain.request.CreateGroupRequest;
 import com.fatec.donation.domain.request.UpdateGroupRequest;
 import com.fatec.donation.services.GroupService;
@@ -10,6 +9,8 @@ import org.apache.shiro.authz.UnauthorizedException;
 import org.neo4j.exceptions.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -19,6 +20,12 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class GroupController {
     private final GroupService service;
+
+    @GetMapping("/print-authorities")
+    public String printAuthorities() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication.getAuthorities().toString();
+    }
 
     @PostMapping("/create")
     public ResponseEntity<GroupDTO> createGroup(@RequestBody CreateGroupRequest request) {

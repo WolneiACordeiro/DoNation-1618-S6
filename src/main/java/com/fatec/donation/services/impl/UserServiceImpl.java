@@ -44,6 +44,7 @@ public class UserServiceImpl implements UserService {
         return null;
     }
 
+    @Override
     public User createUser(CreateUserRequest request){
         User user = new User();
         user.setName(request.getName());
@@ -75,6 +76,7 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
+    @Override
     public User completeInfosUser(CompleteUserRequest request, UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
@@ -91,11 +93,13 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
+    @Override
     public ResponseEntity<UserDTO> getUserProfile(UUID userId) {
         UserDTO user = userRepository.findUserDTOById(userId);
         return ResponseEntity.ok(user);
     }
 
+    @Override
     public UUID getUserIdByJwt() {
         String token = JwtService.extractTokenFromRequest(request);
         String email = jwtService.getEmailFromToken(token);

@@ -55,6 +55,7 @@ public class JwtService {
     private Map<String, Object> generateTokenClaims(User user) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("username", user.getUsername());
+        claims.put("roles", user.getRoles());
         return claims;
     }
 
@@ -74,6 +75,7 @@ public class JwtService {
                     .build()
                     .parseClaimsJws(innerToken);
             Claims claims = jwsClaims.getBody();
+
             return claims.getSubject();
         } catch (JwtException e) {
             throw new InvalidTokenException(e.getMessage());
@@ -81,27 +83,5 @@ public class JwtService {
             throw new InvalidTokenException("Invalid token signature");
         }
     }
-
-//    public Long getUserIdFromToken(String encryptedTokenJwt) {
-//        try {
-//            SecretKey key = keyGenerator.getKey();
-//
-//            String innerToken = Jwts.parser()
-//                    .setSigningKey(key)
-//                    .build()
-//                    .parseClaimsJws(encryptedTokenJwt)
-//                    .getBody()
-//                    .getSubject();
-//
-//            Jws<Claims> jwsClaims = Jwts.parser()
-//                    .setSigningKey(key)
-//                    .build()
-//                    .parseClaimsJws(innerToken);
-//            Claims claims = jwsClaims.getBody();
-//            return claims.get("userId", Long.class);
-//        } catch (JwtException e) {
-//            throw new InvalidTokenException(e.getMessage());
-//        }
-//    }
 
 }

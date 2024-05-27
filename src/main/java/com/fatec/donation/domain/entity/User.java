@@ -2,7 +2,10 @@ package com.fatec.donation.domain.entity;
 
 import com.fatec.donation.domain.enums.BrazilStates;
 import com.fatec.donation.domain.enums.Roles;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.security.core.GrantedAuthority;
@@ -11,7 +14,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;

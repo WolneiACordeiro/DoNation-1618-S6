@@ -7,19 +7,17 @@ import com.fatec.donation.domain.entity.User;
 import com.fatec.donation.domain.mapper.GroupMapper;
 import com.fatec.donation.domain.request.CreateGroupRequest;
 import com.fatec.donation.domain.request.UpdateGroupRequest;
+import com.fatec.donation.exceptions.EntityNotFoundException;
+import com.fatec.donation.exceptions.UnauthorizedException;
 import com.fatec.donation.repository.GroupRepository;
 import com.fatec.donation.repository.JoinGroupRepository;
 import com.fatec.donation.repository.UserRepository;
 import com.fatec.donation.services.GroupService;
 import com.fatec.donation.services.UserService;
 import lombok.RequiredArgsConstructor;
-import org.apache.shiro.authz.UnauthorizedException;
-import org.neo4j.exceptions.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -92,8 +90,6 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public void acceptJoinRequest(UUID requestId) {
-        JoinGroup joinRequest = joinGroupRepository.findById(requestId)
-                .orElseThrow(() -> new EntityNotFoundException("Solicitação não encontrada"));
 
         UUID userId = userService.getUserIdByJwt();
         UUID groupId = joinGroupRepository.findGroupIdByJoinRequestId(requestId);
