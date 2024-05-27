@@ -6,6 +6,8 @@ import com.fatec.donation.domain.entity.AccessToken;
 import com.fatec.donation.domain.entity.User;
 import com.fatec.donation.domain.request.CompleteUserRequest;
 import com.fatec.donation.domain.request.CreateUserRequest;
+
+import com.fatec.donation.exceptions.DuplicatedTupleException;
 import com.fatec.donation.jwt.JwtService;
 import com.fatec.donation.repository.UserRepository;
 import com.fatec.donation.services.UserService;
@@ -46,6 +48,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User createUser(CreateUserRequest request){
+        var possibleCustomer = getByEmail(request.getEmail());
+        if(possibleCustomer != null) {
+            throw new DuplicatedTupleException("Esse email de usuário já se encontra em uso!");
+        }
         User user = new User();
         user.setName(request.getName());
         user.setUsername(request.getUsername());
