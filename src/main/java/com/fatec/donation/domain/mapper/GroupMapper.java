@@ -1,7 +1,9 @@
 package com.fatec.donation.domain.mapper;
 
 import com.fatec.donation.domain.dto.GroupDTO;
+import com.fatec.donation.domain.dto.UserDTO;
 import com.fatec.donation.domain.entity.Group;
+import com.fatec.donation.domain.entity.User;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -11,17 +13,15 @@ public class GroupMapper {
         groupDTO.setName(group.getName());
         groupDTO.setDescription(group.getDescription());
         groupDTO.setAddress(group.getAddress());
-        groupDTO.setOwner(group.getOwner());
+        User user = group.getOwner();
+        UserDTO userDTO = new UserDTO(
+                user.getName(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getRoles()
+        );
+        groupDTO.setOwner(userDTO);
         return groupDTO;
-    }
-
-    public Group dtoToEntity(GroupDTO groupDTO) {
-        Group group = new Group();
-        group.setName(groupDTO.getName());
-        group.setDescription(groupDTO.getName());
-        group.setAddress(groupDTO.getAddress());
-        group.setOwner(groupDTO.getOwner());
-        return group;
     }
 
 }

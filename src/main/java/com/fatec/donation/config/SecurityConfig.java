@@ -45,6 +45,8 @@ public class SecurityConfig {
                     auth.requestMatchers(HttpMethod.GET, "/api/v1/user/profile").authenticated();
                     auth.requestMatchers(HttpMethod.PUT, "/api/v1/user/complete-register").authenticated();
                     auth.requestMatchers(HttpMethod.POST, "/api/v1/groups/create").authenticated();
+                    auth.requestMatchers(HttpMethod.POST, "/api/v1/groups/join-request/{groupId}").authenticated();
+                    auth.requestMatchers(HttpMethod.PUT, "/api/v1/groups/join-request/{requestId}/accept").authenticated();
                     auth.anyRequest().authenticated();
                 })
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)

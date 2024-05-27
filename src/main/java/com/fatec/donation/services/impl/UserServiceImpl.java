@@ -1,7 +1,6 @@
 package com.fatec.donation.services.impl;
 
 import com.fatec.donation.client.CursedWordsService;
-import com.fatec.donation.domain.dto.CompleteUserDTO;
 import com.fatec.donation.domain.dto.UserDTO;
 import com.fatec.donation.domain.entity.AccessToken;
 import com.fatec.donation.domain.entity.User;
