@@ -14,6 +14,7 @@ import com.fatec.donation.repository.JoinGroupRepository;
 import com.fatec.donation.repository.UserRepository;
 import com.fatec.donation.services.GroupService;
 import com.fatec.donation.services.UserService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +31,7 @@ public class GroupServiceImpl implements GroupService {
     private final JoinGroupRepository joinGroupRepository;
 
     @Override
+    @Transactional
     public GroupDTO createGroup(CreateGroupRequest request) {
         UUID userId = userService.getUserIdByJwt();
         User user = userRepository.findUserById(userId);
@@ -44,6 +46,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
+    @Transactional
     public GroupDTO updateGroup(UUID groupId, UpdateGroupRequest request) {
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new EntityNotFoundException("Grupo não encontrado"));
@@ -59,6 +62,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
+    @Transactional
     public void deleteGroup(UUID groupId) {
         UUID userId = userService.getUserIdByJwt();
         Group group = groupRepository.findById(groupId)
@@ -70,6 +74,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
+    @Transactional
     public void createJoinRequest(UUID groupId) {
         UUID userId = userService.getUserIdByJwt();
         Group group = groupRepository.findById(groupId)
@@ -89,6 +94,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
+    @Transactional
     public void acceptJoinRequest(UUID requestId) {
 
         UUID userId = userService.getUserIdByJwt();

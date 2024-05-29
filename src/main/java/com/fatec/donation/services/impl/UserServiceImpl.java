@@ -12,7 +12,9 @@ import com.fatec.donation.jwt.JwtService;
 import com.fatec.donation.repository.UserRepository;
 import com.fatec.donation.services.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.annotation.ReadOnlyProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -34,6 +36,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @ReadOnlyProperty
     public AccessToken authenticate(String email, String password) {
         var user = getByEmail(email);
         if(user == null){
@@ -47,6 +50,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public User createUser(CreateUserRequest request){
         var possibleCustomer = getByEmail(request.getEmail());
         if(possibleCustomer != null) {
@@ -83,6 +87,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public User completeInfosUser(CompleteUserRequest request, UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
@@ -100,12 +105,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @ReadOnlyProperty
     public ResponseEntity<UserDTO> getUserProfile(UUID userId) {
         UserDTO user = userRepository.findUserDTOById(userId);
         return ResponseEntity.ok(user);
     }
 
     @Override
+    @ReadOnlyProperty
     public UUID getUserIdByJwt() {
         String token = JwtService.extractTokenFromRequest(request);
         String email = jwtService.getEmailFromToken(token);
