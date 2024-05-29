@@ -1,7 +1,9 @@
 package com.fatec.donation.domain.entity;
 import lombok.*;
 
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
 @Builder
 public class CursedWord {
     private String text;

@@ -3,10 +3,10 @@ package com.fatec.donation.services.impl;
 import com.fatec.donation.client.CursedWordsService;
 import com.fatec.donation.domain.dto.UserDTO;
 import com.fatec.donation.domain.entity.AccessToken;
+import com.fatec.donation.domain.entity.CursedWord;
 import com.fatec.donation.domain.entity.User;
 import com.fatec.donation.domain.request.CompleteUserRequest;
 import com.fatec.donation.domain.request.CreateUserRequest;
-
 import com.fatec.donation.exceptions.DuplicatedTupleException;
 import com.fatec.donation.jwt.JwtService;
 import com.fatec.donation.repository.UserRepository;
@@ -20,7 +20,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -38,77 +41,63 @@ public class UserServiceImpl implements UserService {
     @Override
     @ReadOnlyProperty
     public AccessToken authenticate(String email, String password) {
-        var user = getByEmail(email);
-        if(user == null){
+        User user = getByEmail(email);
+        if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
             return null;
         }
-        boolean matches = passwordEncoder.matches(password, user.getPassword());
-        if(matches){
-            return jwtService.generateToken(user);
-        }
-        return null;
+        return jwtService.generateToken(user);
     }
 
     @Override
     @Transactional
-    public User createUser(CreateUserRequest request){
-        var possibleCustomer = getByEmail(request.getEmail());
-        if(possibleCustomer != null) {
-            throw new DuplicatedTupleException("Esse email de usuário já se encontra em uso!");
+    public User createUser(CreateUserRequest createUserRequest) {
+        validateDuplicateEmail(createUserRequest.getEmail());
+
+        List<CursedWord> wordsToCheck = Arrays.asList(
+                new CursedWord(createUserRequest.getName()),
+                new CursedWord(createUserRequest.getUsername())
+        );
+
+        if (containsInappropriateWords(wordsToCheck)) {
+            throw new IllegalArgumentException("O nome ou nome de usuário contém palavras impróprias.");
         }
-        User user = new User();
-        user.setName(request.getName());
-        user.setUsername(request.getUsername());
-        user.setEmail(request.getEmail());
-        user.setFirstAccess(true);
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setCreatedAt(LocalDateTime.now());
-        user.setRoles(request.getRoles());
 
-//        List<String> wordsToCheck = Arrays.asList(request.getName(), request.getUsername());
-//        boolean isAnyWordInappropriate = wordsToCheck.parallelStream()
-//                .map(word -> {
-//                    CursedWord requestData = new CursedWord();
-//                    requestData.setText(word);
-//                    ResponseData responseData = cursedWordsService.postEndpointData(requestData);
-//                    return responseData.getInappropriate();
-//                })
-//                .anyMatch(b -> b == true);
-//
-//        System.out.println("Inappropriate: " + isAnyWordInappropriate);
+        User newUser = new User();
+        newUser.setName(createUserRequest.getName());
+        newUser.setUsername(createUserRequest.getUsername());
+        newUser.setEmail(createUserRequest.getEmail());
+        newUser.setFirstAccess(true);
+        newUser.setPassword(passwordEncoder.encode(createUserRequest.getPassword()));
+        newUser.setCreatedAt(LocalDateTime.now());
+        newUser.setRoles(createUserRequest.getRoles());
 
-//        if (!isAnyWordInappropriate) {
-//            userRepository.save(user);
-//        }
+        userRepository.save(newUser);
 
-        userRepository.save(user);
-
-        return user;
+        return newUser;
     }
 
     @Override
     @Transactional
-    public User completeInfosUser(CompleteUserRequest request, UUID userId) {
+    public User completeInfosUser(CompleteUserRequest completeUserRequest, UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
 
-        user.setPhone(request.getPhone());
-        user.setBirthday(request.getBirthday());
-        user.setState(request.getState());
-        user.setCity(request.getCity());
-        user.setTags(request.getTags());
+        user.setPhone(completeUserRequest.getPhone());
+        user.setBirthday(completeUserRequest.getBirthday());
+        user.setState(completeUserRequest.getState());
+        user.setCity(completeUserRequest.getCity());
+        user.setTags(completeUserRequest.getTags());
         user.setFirstAccess(false);
 
         userRepository.save(user);
-
         return user;
     }
 
     @Override
     @ReadOnlyProperty
     public ResponseEntity<UserDTO> getUserProfile(UUID userId) {
-        UserDTO user = userRepository.findUserDTOById(userId);
-        return ResponseEntity.ok(user);
+        UserDTO userDTO = userRepository.findUserDTOById(userId);
+        return ResponseEntity.ok(userDTO);
     }
 
     @Override
@@ -117,7 +106,22 @@ public class UserServiceImpl implements UserService {
         String token = JwtService.extractTokenFromRequest(request);
         String email = jwtService.getEmailFromToken(token);
         User user = userRepository.findUserByEmail(email);
+        if (user == null) {
+            throw new IllegalArgumentException("Usuário não encontrado para o token fornecido.");
+        }
         return user.getId();
     }
 
+    private void validateDuplicateEmail(String email) {
+        if (getByEmail(email) != null) {
+            throw new DuplicatedTupleException("Esse email de usuário já se encontra em uso!");
+        }
+    }
+
+    private boolean containsInappropriateWords(List<CursedWord> words) {
+        return words.parallelStream()
+                .map(word -> cursedWordsService.isWordInappropriate(word))
+                .collect(Collectors.toList())
+                .contains(true);
+    }
 }
