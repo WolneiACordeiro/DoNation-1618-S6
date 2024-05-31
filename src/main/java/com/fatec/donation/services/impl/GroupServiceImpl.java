@@ -2,11 +2,10 @@ package com.fatec.donation.services.impl;
 
 import com.fatec.donation.domain.dto.GroupDTO;
 import com.fatec.donation.domain.entity.Group;
-import com.fatec.donation.domain.request.BlockUserJoinRequest;
-import com.fatec.donation.domain.request.JoinGroupRequest;
 import com.fatec.donation.domain.entity.User;
 import com.fatec.donation.domain.mapper.GroupMapper;
 import com.fatec.donation.domain.request.CreateGroupRequest;
+import com.fatec.donation.domain.request.JoinGroupRequest;
 import com.fatec.donation.domain.request.UpdateGroupRequest;
 import com.fatec.donation.exceptions.EntityNotFoundException;
 import com.fatec.donation.exceptions.IllegalStateException;
@@ -103,6 +102,9 @@ public class GroupServiceImpl implements GroupService {
         }
         if (joinGroupRequestRepository.memberByUserIdAndGroupId(blockedUserId, groupId)) {
             throw new IllegalStateException("Você não pode bloquear um membro participante do grupo");
+        }
+        if (blockUserJoinRequestRepository.existsByUserIdAndGroupId(blockedUserId, groupId)) {
+            throw new IllegalStateException("Esse usuário já se encontra bloqueado");
         }
         group.getBlocked().add(blockedUser);
         groupRepository.save(group);
