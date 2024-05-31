@@ -4,14 +4,14 @@ import com.fatec.donation.client.CursedWordsService;
 import com.fatec.donation.domain.dto.UserDTO;
 import com.fatec.donation.domain.entity.AccessToken;
 import com.fatec.donation.domain.entity.CursedWord;
-import com.fatec.donation.domain.entity.ResponseData;
+import com.fatec.donation.domain.entity.ResponseCursedWord;
 import com.fatec.donation.domain.entity.User;
+import com.fatec.donation.domain.mapper.UserMapper;
 import com.fatec.donation.domain.request.CompleteUserRequest;
 import com.fatec.donation.domain.request.CreateUserRequest;
 import com.fatec.donation.exceptions.DuplicatedTupleException;
 import com.fatec.donation.exceptions.EntityNotFoundException;
 import com.fatec.donation.jwt.JwtService;
-import com.fatec.donation.mapper.UserMapper;
 import com.fatec.donation.repository.UserRepository;
 import com.fatec.donation.services.UserService;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
@@ -120,8 +120,8 @@ public class UserServiceImpl implements UserService {
     private boolean containsInappropriateWords(List<CursedWord> words) {
         return words.stream()
                 .anyMatch(word -> {
-                    ResponseData responseData = cursedWordsService.isWordInappropriate(word);
-                    return responseData.isInappropriate();
+                    ResponseCursedWord responseCursedWord = cursedWordsService.isWordInappropriate(word);
+                    return responseCursedWord.isInappropriate();
                 });
     }
 

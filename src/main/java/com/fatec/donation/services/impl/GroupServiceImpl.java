@@ -2,15 +2,18 @@ package com.fatec.donation.services.impl;
 
 import com.fatec.donation.domain.dto.GroupDTO;
 import com.fatec.donation.domain.entity.Group;
-import com.fatec.donation.domain.entity.JoinGroup;
+import com.fatec.donation.domain.request.BlockUserJoinRequest;
+import com.fatec.donation.domain.request.JoinGroupRequest;
 import com.fatec.donation.domain.entity.User;
 import com.fatec.donation.domain.mapper.GroupMapper;
 import com.fatec.donation.domain.request.CreateGroupRequest;
 import com.fatec.donation.domain.request.UpdateGroupRequest;
 import com.fatec.donation.exceptions.EntityNotFoundException;
+import com.fatec.donation.exceptions.IllegalStateException;
 import com.fatec.donation.exceptions.UnauthorizedException;
+import com.fatec.donation.repository.BlockUserJoinRequestRepository;
 import com.fatec.donation.repository.GroupRepository;
-import com.fatec.donation.repository.JoinGroupRepository;
+import com.fatec.donation.repository.JoinGroupRequestRepository;
 import com.fatec.donation.repository.UserRepository;
 import com.fatec.donation.services.GroupService;
 import com.fatec.donation.services.UserService;
@@ -18,6 +21,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -27,7 +31,8 @@ public class GroupServiceImpl implements GroupService {
     private final GroupMapper groupMapper;
     private final UserRepository userRepository;
     private final GroupRepository groupRepository;
-    private final JoinGroupRepository joinGroupRepository;
+    private final JoinGroupRequestRepository joinGroupRequestRepository;
+    private final BlockUserJoinRequestRepository blockUserJoinRequestRepository;
 
     @Override
     @Transactional
@@ -72,34 +77,64 @@ public class GroupServiceImpl implements GroupService {
         UUID userId = userService.getUserIdByJwt();
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new EntityNotFoundException("Grupo não encontrado"));
-
-        if (joinGroupRepository.existsByUserIdAndGroupId(userId, groupId)) {
+        if (joinGroupRequestRepository.existsByUserIdAndGroupId(userId, groupId)) {
             throw new IllegalStateException("Você já é membro ou solicitou entrada neste grupo");
         }
-
-        JoinGroup joinRequest = new JoinGroup();
+        if (joinGroupRequestRepository.ownerByUserIdAndGroupId(userId, groupId)) {
+            throw new IllegalStateException("Você já é proprietário desse grupo");
+        }
+        JoinGroupRequest joinRequest = new JoinGroupRequest();
         joinRequest.setUser(userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado")));
         joinRequest.setGroup(group);
-        joinGroupRepository.save(joinRequest);
+        joinRequest.setCreatedAt(LocalDateTime.now());
+        joinGroupRequestRepository.save(joinRequest);
+    }
+
+    @Override
+    @Transactional
+    public void blockJoinRequest(UUID groupId, UUID blockedUserId) {
+        UUID userId = userService.getUserIdByJwt();
+        User blockedUser = userService.getById(blockedUserId);
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new EntityNotFoundException("Grupo não encontrado"));
+        if (!group.getOwner().getId().equals(userId)) {
+            throw new UnauthorizedException("Você não tem permissão para bloquear alguém neste grupo");
+        }
+        if (joinGroupRequestRepository.memberByUserIdAndGroupId(blockedUserId, groupId)) {
+            throw new IllegalStateException("Você não pode bloquear um membro participante do grupo");
+        }
+        group.getBlocked().add(blockedUser);
+        groupRepository.save(group);
     }
 
     @Override
     @Transactional
     public void acceptJoinRequest(UUID requestId) {
-        JoinGroup joinRequest = joinGroupRepository.findById(requestId)
+        JoinGroupRequest joinRequest = joinGroupRequestRepository.findById(requestId)
                 .orElseThrow(() -> new EntityNotFoundException("Solicitação de entrada em grupo não encontrada"));
-
         UUID userId = userService.getUserIdByJwt();
         Group group = joinRequest.getGroup();
 
         if (!group.getOwner().getId().equals(userId)) {
             throw new UnauthorizedException("Você não tem permissão para aceitar esta solicitação");
         }
-
         group.getMember().add(joinRequest.getUser());
-        joinGroupRepository.delete(joinRequest);
+        joinGroupRequestRepository.delete(joinRequest);
         groupRepository.save(group);
+    }
+
+    @Override
+    @Transactional
+    public void rejectJoinRequest(UUID requestId) {
+        JoinGroupRequest joinRequest = joinGroupRequestRepository.findById(requestId)
+                .orElseThrow(() -> new EntityNotFoundException("Solicitação de entrada em grupo não encontrada"));
+        UUID userId = userService.getUserIdByJwt();
+        Group group = joinRequest.getGroup();
+        if (!group.getOwner().getId().equals(userId)) {
+            throw new UnauthorizedException("Você não tem permissão para rejeitar esta solicitação");
+        }
+        joinGroupRequestRepository.delete(joinRequest);
     }
 
 }

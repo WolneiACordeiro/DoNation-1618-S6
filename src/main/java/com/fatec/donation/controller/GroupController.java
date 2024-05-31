@@ -19,24 +19,24 @@ import java.util.UUID;
 @RequestMapping("/api/v1/groups")
 @RequiredArgsConstructor
 public class GroupController {
-    private final GroupService service;
+    private final GroupService groupService;
 
-    @GetMapping("/print-authorities")
-    public String printAuthorities() {
+    @GetMapping("/authorities")
+    public ResponseEntity<String> getAuthorities() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return authentication.getAuthorities().toString();
+        return ResponseEntity.ok(authentication.getAuthorities().toString());
     }
 
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<GroupDTO> createGroup(@RequestBody CreateGroupRequest request) {
-        GroupDTO groupCreated = service.createGroup(request);
-        return new ResponseEntity<>(groupCreated, HttpStatus.CREATED);
+        GroupDTO groupCreated = groupService.createGroup(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(groupCreated);
     }
 
-    @PutMapping("/update/{groupId}")
+    @PutMapping("/{groupId}")
     public ResponseEntity<GroupDTO> updateGroup(@PathVariable UUID groupId, @RequestBody UpdateGroupRequest request) {
         try {
-            GroupDTO updatedGroup = service.updateGroup(groupId, request);
+            GroupDTO updatedGroup = groupService.updateGroup(groupId, request);
             return ResponseEntity.ok(updatedGroup);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.notFound().build();
@@ -45,10 +45,10 @@ public class GroupController {
         }
     }
 
-    @DeleteMapping("/delete/{groupId}")
+    @DeleteMapping("/{groupId}")
     public ResponseEntity<Void> deleteGroup(@PathVariable UUID groupId) {
         try {
-            service.deleteGroup(groupId);
+            groupService.deleteGroup(groupId);
             return ResponseEntity.noContent().build();
         } catch (EntityNotFoundException e) {
             return ResponseEntity.notFound().build();
@@ -57,16 +57,23 @@ public class GroupController {
         }
     }
 
-    @PostMapping("/join-request/{groupId}")
+    @PostMapping("/join/{groupId}")
     public ResponseEntity<Void> createJoinRequest(@PathVariable UUID groupId) {
-        service.createJoinRequest(groupId);
+        groupService.createJoinRequest(groupId);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @PutMapping("/join-request/{requestId}/accept")
+    @PutMapping("/join/{requestId}/accept")
     public ResponseEntity<Void> acceptJoinRequest(@PathVariable UUID requestId) {
-        service.acceptJoinRequest(requestId);
+        groupService.acceptJoinRequest(requestId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @PutMapping("/join/{requestId}/reject")
+    public ResponseEntity<Void> rejectJoinRequest(@PathVariable UUID requestId) {
+        groupService.rejectJoinRequest(requestId);
         return ResponseEntity.noContent().build();
     }
+
 
 }

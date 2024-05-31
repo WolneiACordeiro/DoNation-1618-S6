@@ -1,4 +1,4 @@
-package com.fatec.donation.mapper;
+package com.fatec.donation.domain.mapper;
 
 import com.fatec.donation.domain.dto.CompleteUserDTO;
 import com.fatec.donation.domain.dto.UserDTO;

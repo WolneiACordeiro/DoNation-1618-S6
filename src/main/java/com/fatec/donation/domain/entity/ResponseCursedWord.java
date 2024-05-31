@@ -6,7 +6,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ResponseData {
+public class ResponseCursedWord {
     private Boolean inappropriate;
 
     public boolean isInappropriate() {

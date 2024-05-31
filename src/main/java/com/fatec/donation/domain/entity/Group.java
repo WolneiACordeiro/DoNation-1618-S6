@@ -28,6 +28,8 @@ public class Group {
     private User owner;
     @Relationship(type = "MEMBER", direction = Relationship.Direction.INCOMING)
     private Set<User> member;
+    @Relationship(type = "BLOCKED", direction = Relationship.Direction.INCOMING)
+    private Set<User> blocked;
     public Group() {
         this.id = UUID.randomUUID();
     }

@@ -13,4 +13,6 @@ public interface GroupService {
     void deleteGroup(UUID groupId);
     void createJoinRequest(UUID groupId);
     void acceptJoinRequest(UUID requestId);
+    void rejectJoinRequest(UUID requestId);
+    void blockJoinRequest(UUID groupId, UUID blockedUserId);
 }

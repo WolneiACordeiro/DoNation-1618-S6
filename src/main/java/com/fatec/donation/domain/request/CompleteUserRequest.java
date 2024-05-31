@@ -1,6 +1,7 @@
 package com.fatec.donation.domain.request;
 
 import com.fatec.donation.domain.enums.BrazilStates;
+import com.fatec.donation.utils.CompatibleWithEnum;
 import lombok.Data;
 import jakarta.validation.constraints.*;
 import java.time.LocalDate;
@@ -15,6 +16,7 @@ public class CompleteUserRequest {
     @Past(message = "A data de nascimento deve ser uma data passada")
     private LocalDate birthday;
     @NotNull(message = "O estado é obrigatório")
+    @CompatibleWithEnum(enumClass = BrazilStates.class, message = "Estado inválido")
     private BrazilStates state;
     @NotBlank(message = "A cidade é obrigatória")
     private String city;
