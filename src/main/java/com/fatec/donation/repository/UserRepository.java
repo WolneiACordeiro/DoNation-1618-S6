@@ -14,8 +14,8 @@ import java.util.UUID;
 public interface UserRepository extends Neo4jRepository<User, UUID> {
     Optional<User> findUserByUsername(String username);
     User findUserById(UUID id);
-    UserDTO findUserDTOById(UUID id);
-    User findUserByEmail(String email);
+    Optional<UserDTO> findUserDTOById(UUID id);
+    Optional<User> findUserByEmail(String email);
     @Query("MATCH (user:User), (course:Course) WHERE user.username = $username AND course.identifier = $identifier " +
             "RETURN EXISTS((user)-[:ENROLLED_IN]->(course))")
     Boolean findEnrolmentStatus(String username, String identifier);

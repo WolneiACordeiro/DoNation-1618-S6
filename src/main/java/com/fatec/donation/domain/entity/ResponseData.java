@@ -8,4 +8,9 @@ import lombok.*;
 @Builder
 public class ResponseData {
     private Boolean inappropriate;
+
+    public boolean isInappropriate() {
+        return Boolean.TRUE.equals(inappropriate);
+    }
+
 }

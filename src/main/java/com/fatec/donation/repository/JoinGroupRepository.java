@@ -11,7 +11,7 @@ public interface JoinGroupRepository extends Neo4jRepository<JoinGroup, UUID> {
             "MATCH (joinRequest:JoinRequest)-[:REQUESTED_BY]->(user) " +
             "MATCH (joinRequest)-[:FOR_GROUP]->(group:Group {id: $group}) " +
             "RETURN COUNT(joinRequest) > 0 AS exists")
-    boolean joinRequestByUserIdAndGroupId(UUID user, UUID group);
+    boolean existsByUserIdAndGroupId(UUID user, UUID group);
 
     @Query("MATCH (user:User {id: $user})<-[:OWNER]-(group:Group {id: $group}) " +
             "RETURN COUNT(group) > 0 AS exists")
