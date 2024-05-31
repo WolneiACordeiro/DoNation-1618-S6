@@ -94,7 +94,8 @@ public class GroupServiceImpl implements GroupService {
     @Transactional
     public void blockJoinRequest(UUID groupId, UUID blockedUserId) {
         UUID userId = userService.getUserIdByJwt();
-        User blockedUser = userService.getById(blockedUserId);
+        User blockedUser = userRepository.findById(blockedUserId)
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new EntityNotFoundException("Grupo não encontrado"));
         if (!group.getOwner().getId().equals(userId)) {
