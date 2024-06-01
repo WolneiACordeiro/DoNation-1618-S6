@@ -11,6 +11,7 @@ import com.fatec.donation.domain.request.CompleteUserRequest;
 import com.fatec.donation.domain.request.CreateUserRequest;
 import com.fatec.donation.exceptions.DuplicatedTupleException;
 import com.fatec.donation.exceptions.EntityNotFoundException;
+import com.fatec.donation.exceptions.IllegalArgumentException;
 import com.fatec.donation.jwt.JwtService;
 import com.fatec.donation.repository.UserRepository;
 import com.fatec.donation.services.UserService;
@@ -21,13 +22,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +41,7 @@ public class UserServiceImpl implements UserService {
     private final JwtService jwtService;
     private final HttpServletRequest request;
     private final UserMapper userMapper;
+    private final PlatformTransactionManager transactionManager;
 
     @Override
     public User getByEmail(String email) {
@@ -46,7 +50,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, transactionManager = "transactionManager")
     public AccessToken authenticate(String email, String password) {
         User user = getByEmail(email);
         if (!passwordEncoder.matches(password, user.getPassword())) {
@@ -56,11 +60,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
+    @Transactional(transactionManager = "transactionManager")
     public User createUser(CreateUserRequest createUserRequest) {
         validateDuplicateEmail(createUserRequest.getEmail());
         validateInappropriateContent(createUserRequest);
-
         User newUser = userMapper.toUser(createUserRequest);
         newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
         userRepository.save(newUser);
@@ -68,7 +71,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
+    @Transactional(transactionManager = "transactionManager")
     public User completeInfosUser(CompleteUserRequest completeUserRequest, UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
@@ -78,7 +81,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, transactionManager = "transactionManager")
     public ResponseEntity<UserDTO> getUserProfile(UUID userId) {
         return userRepository.findUserDTOById(userId)
                 .map(ResponseEntity::ok)
@@ -86,7 +89,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, transactionManager = "transactionManager")
     public UUID getUserIdByJwt() {
         String token = JwtService.extractTokenFromRequest(request);
         String email = jwtService.getEmailFromToken(token);
@@ -103,29 +106,32 @@ public class UserServiceImpl implements UserService {
     }
 
     private void validateInappropriateContent(CreateUserRequest request) {
-        List<CursedWord> wordsToCheck = buildCursedWordsList(request.getName(), request.getUsername());
-        if (containsInappropriateWords(wordsToCheck)) {
+        List<CursedWord> wordsToCheck = Arrays.asList(
+                new CursedWord(request.getName()),
+                new CursedWord(request.getUsername())
+        );
+
+        List<CompletableFuture<Boolean>> futures = wordsToCheck.stream()
+                .map(word -> CompletableFuture.supplyAsync(() -> isInappropriateWord(word)))
+                .collect(Collectors.toList());
+
+        boolean hasInappropriateWord = futures.stream()
+                .map(CompletableFuture::join)
+                .anyMatch(result -> result);
+
+        if (hasInappropriateWord) {
             throw new IllegalArgumentException("O nome ou nome de usuário contém palavras impróprias.");
         }
     }
 
-    private List<CursedWord> buildCursedWordsList(String... words) {
-        return Stream.of(words)
-                .map(CursedWord::new)
-                .collect(Collectors.toList());
-    }
-
-    @CircuitBreaker(name = "cursedWordsService", fallbackMethod = "fallbackForInappropriateWords")
+    @CircuitBreaker(name = "cursedWordsService", fallbackMethod = "fallbackForInappropriateWord")
     @Retry(name = "cursedWordsService")
-    private boolean containsInappropriateWords(List<CursedWord> words) {
-        return words.stream()
-                .anyMatch(word -> {
-                    ResponseCursedWord responseCursedWord = cursedWordsService.isWordInappropriate(word);
-                    return responseCursedWord.isInappropriate();
-                });
+    private boolean isInappropriateWord(CursedWord word) {
+        ResponseCursedWord responseCursedWord = cursedWordsService.isWordInappropriate(word);
+        return responseCursedWord.getInapropriado();
     }
 
-    private boolean fallbackForInappropriateWords(List<CursedWord> words, Throwable t) {
+    private boolean fallbackForInappropriateWord(CursedWord word, Throwable t) {
         return false;
     }
 }

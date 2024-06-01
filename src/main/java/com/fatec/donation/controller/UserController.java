@@ -4,10 +4,11 @@ import com.fatec.donation.domain.dto.CompleteUserDTO;
 import com.fatec.donation.domain.dto.CredentialsDTO;
 import com.fatec.donation.domain.dto.UserDTO;
 import com.fatec.donation.domain.entity.User;
+import com.fatec.donation.domain.mapper.UserMapper;
 import com.fatec.donation.domain.request.CompleteUserRequest;
 import com.fatec.donation.domain.request.CreateUserRequest;
 import com.fatec.donation.services.UserService;
-import com.fatec.donation.mapper.UserMapper;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

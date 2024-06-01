@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-@FeignClient(name = "cursedWordsService", url = "http://10.67.56.204:5000")
+@FeignClient(name = "cursedWordsService", url = "http://127.0.0.1:8888")
 public interface CursedWordsService {
     @RequestMapping(method = RequestMethod.POST, value = "/api/analyze-text")
     ResponseCursedWord isWordInappropriate(@RequestBody CursedWord requestData);

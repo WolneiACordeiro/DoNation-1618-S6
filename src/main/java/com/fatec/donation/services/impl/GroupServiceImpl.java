@@ -16,9 +16,10 @@ import com.fatec.donation.repository.JoinGroupRequestRepository;
 import com.fatec.donation.repository.UserRepository;
 import com.fatec.donation.services.GroupService;
 import com.fatec.donation.services.UserService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -32,9 +33,10 @@ public class GroupServiceImpl implements GroupService {
     private final GroupRepository groupRepository;
     private final JoinGroupRequestRepository joinGroupRequestRepository;
     private final BlockUserJoinRequestRepository blockUserJoinRequestRepository;
+    private final PlatformTransactionManager transactionManager;
 
     @Override
-    @Transactional
+    @Transactional(transactionManager = "transactionManager")
     public GroupDTO createGroup(CreateGroupRequest request) {
         UUID userId = userService.getUserIdByJwt();
         User user = userRepository.findById(userId)
@@ -45,7 +47,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    @Transactional
+    @Transactional(transactionManager = "transactionManager")
     public GroupDTO updateGroup(UUID groupId, UpdateGroupRequest request) {
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new EntityNotFoundException("Grupo não encontrado"));
@@ -59,7 +61,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    @Transactional
+    @Transactional(transactionManager = "transactionManager")
     public void deleteGroup(UUID groupId) {
         UUID userId = userService.getUserIdByJwt();
         Group group = groupRepository.findById(groupId)
@@ -71,7 +73,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    @Transactional
+    @Transactional(transactionManager = "transactionManager")
     public void createJoinRequest(UUID groupId) {
         UUID userId = userService.getUserIdByJwt();
         Group group = groupRepository.findById(groupId)
@@ -91,7 +93,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    @Transactional
+    @Transactional(transactionManager = "transactionManager")
     public void blockJoinRequest(UUID groupId, UUID blockedUserId) {
         UUID userId = userService.getUserIdByJwt();
         User blockedUser = userRepository.findById(blockedUserId)
@@ -112,7 +114,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    @Transactional
+    @Transactional(transactionManager = "transactionManager")
     public void acceptJoinRequest(UUID requestId) {
         JoinGroupRequest joinRequest = joinGroupRequestRepository.findById(requestId)
                 .orElseThrow(() -> new EntityNotFoundException("Solicitação de entrada em grupo não encontrada"));
@@ -128,7 +130,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    @Transactional
+    @Transactional(transactionManager = "transactionManager")
     public void rejectJoinRequest(UUID requestId) {
         JoinGroupRequest joinRequest = joinGroupRequestRepository.findById(requestId)
                 .orElseThrow(() -> new EntityNotFoundException("Solicitação de entrada em grupo não encontrada"));

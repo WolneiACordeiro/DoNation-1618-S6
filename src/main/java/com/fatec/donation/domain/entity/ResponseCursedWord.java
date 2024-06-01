@@ -7,10 +7,10 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class ResponseCursedWord {
-    private Boolean inappropriate;
+    private Boolean inapropriado;
 
     public boolean isInappropriate() {
-        return Boolean.TRUE.equals(inappropriate);
+        return Boolean.TRUE.equals(inapropriado);
     }
 
 }

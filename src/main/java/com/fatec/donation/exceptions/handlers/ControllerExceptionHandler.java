@@ -4,6 +4,7 @@ import com.fatec.donation.exceptions.*;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.ValueInstantiationException;
+import com.fatec.donation.exceptions.IllegalArgumentException;
 import com.fatec.donation.exceptions.errors.CustomError;
 import com.fatec.donation.exceptions.errors.ValidationError;
 import jakarta.servlet.http.HttpServletRequest;
@@ -65,6 +66,13 @@ public class ControllerExceptionHandler {
 
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<CustomError> illegalStateException(IllegalStateException e, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.FORBIDDEN;
+        CustomError err = new CustomError(Instant.now(), status.value(), e.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<CustomError> illegalArgumentException(IllegalArgumentException e, HttpServletRequest request) {
         HttpStatus status = HttpStatus.FORBIDDEN;
         CustomError err = new CustomError(Instant.now(), status.value(), e.getMessage(), request.getRequestURI());
         return ResponseEntity.status(status).body(err);
