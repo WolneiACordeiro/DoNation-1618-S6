@@ -12,13 +12,10 @@ import java.util.UUID;
 
 @Repository
 public interface UserRepository extends Neo4jRepository<User, UUID> {
-    Optional<User> findUserByUsername(String username);
-    User findUserById(UUID id);
+    Boolean existsByUsername(String username);
+    Boolean existsByEmail(String email);
     Optional<UserDTO> findUserDTOById(UUID id);
     Optional<User> findUserByEmail(String email);
-    @Query("MATCH (user:User), (course:Course) WHERE user.username = $username AND course.identifier = $identifier " +
-            "RETURN EXISTS((user)-[:ENROLLED_IN]->(course))")
-    Boolean findEnrolmentStatus(String username, String identifier);
     CompleteUserDTO findCompleteUserDTOById(UUID io);
 
 }

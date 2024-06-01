@@ -9,6 +9,7 @@ import com.fatec.donation.domain.request.UpdateGroupRequest;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Component
 public class GroupMapper {
@@ -30,13 +31,14 @@ public class GroupMapper {
     }
 
     public Group toGroup(CreateGroupRequest request, User owner) {
-        Group group = new Group();
-        group.setName(request.getName());
-        group.setDescription(request.getDescription());
-        group.setAddress(request.getAddress());
-        group.setCreatedAt(LocalDateTime.now());
-        group.setOwner(owner);
-        return group;
+        return Group.builder()
+        .id(UUID.randomUUID())
+        .name(request.getName())
+        .description(request.getDescription())
+        .address(request.getAddress())
+        .createdAt(LocalDateTime.now())
+        .owner(owner)
+        .build();
     }
 
     public void updateGroupWithRequest(Group group, UpdateGroupRequest request) {

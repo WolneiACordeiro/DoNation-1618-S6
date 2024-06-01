@@ -8,12 +8,14 @@ import com.fatec.donation.domain.request.CreateUserRequest;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Component
 public class UserMapper {
 
     public User toUser(CreateUserRequest request) {
         return User.builder()
+                .id(UUID.randomUUID())
                 .name(request.getName())
                 .username(request.getUsername())
                 .email(request.getEmail())

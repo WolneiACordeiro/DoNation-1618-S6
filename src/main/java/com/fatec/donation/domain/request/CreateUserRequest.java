@@ -10,8 +10,10 @@ import java.util.Set;
 @Data
 public class CreateUserRequest {
     @Size(min = 3, max = 50, message = "Seu nome deve ter entre 3 a 50 caracteres")
+    @Pattern(regexp = "^[a-zA-ZÀ-ÿ\\s]*$", message = "Seu nome deve conter apenas letras")
     private String name;
     @Size(min = 3, max = 16, message = "Nome de usuário deve ter entre 3 a 16 caracteres")
+    @Pattern(regexp = "^[a-zA-Z0-9_]*$", message = "Nome de usuário deve conter apenas letras, números e underscores")
     private String username;
     @Email(message = "Precisa ser um email válido")
     private String email;

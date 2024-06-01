@@ -63,6 +63,12 @@ public class GroupController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @PostMapping("/block/{groupId}/{blockedUserId}")
+    public ResponseEntity<Void> blockJoinRequest(@PathVariable UUID groupId, @PathVariable UUID blockedUserId) {
+        groupService.blockJoinRequest(groupId, blockedUserId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
     @PutMapping("/join/{requestId}/accept")
     public ResponseEntity<Void> acceptJoinRequest(@PathVariable UUID requestId) {
         groupService.acceptJoinRequest(requestId);

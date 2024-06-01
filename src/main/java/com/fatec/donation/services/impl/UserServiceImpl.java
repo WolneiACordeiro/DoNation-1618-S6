@@ -15,6 +15,7 @@ import com.fatec.donation.exceptions.IllegalArgumentException;
 import com.fatec.donation.jwt.JwtService;
 import com.fatec.donation.repository.UserRepository;
 import com.fatec.donation.services.UserService;
+import feign.FeignException;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import jakarta.servlet.http.HttpServletRequest;
@@ -62,7 +63,12 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(transactionManager = "transactionManager")
     public User createUser(CreateUserRequest createUserRequest) {
-        validateDuplicateEmail(createUserRequest.getEmail());
+        if (isEmailAlreadyExists(createUserRequest.getEmail())) {
+            throw new DuplicatedTupleException("Esse email de usuário já se encontra em uso!");
+        }
+        if (isUsernameAlreadyExists(createUserRequest.getUsername())) {
+            throw new DuplicatedTupleException("Esse nome de usuário já se encontra em uso!");
+        }
         validateInappropriateContent(createUserRequest);
         User newUser = userMapper.toUser(createUserRequest);
         newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
@@ -98,11 +104,12 @@ public class UserServiceImpl implements UserService {
 
     // Métodos auxiliares
 
-    private void validateDuplicateEmail(String email) {
-        Optional<User> existingUser = userRepository.findUserByEmail(email);
-        if (existingUser.isPresent()) {
-            throw new DuplicatedTupleException("Esse email de usuário já se encontra em uso!");
-        }
+    private boolean isEmailAlreadyExists(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
+    private boolean isUsernameAlreadyExists(String username) {
+        return userRepository.existsByUsername(username);
     }
 
     private void validateInappropriateContent(CreateUserRequest request) {
@@ -127,8 +134,12 @@ public class UserServiceImpl implements UserService {
     @CircuitBreaker(name = "cursedWordsService", fallbackMethod = "fallbackForInappropriateWord")
     @Retry(name = "cursedWordsService")
     private boolean isInappropriateWord(CursedWord word) {
-        ResponseCursedWord responseCursedWord = cursedWordsService.isWordInappropriate(word);
-        return responseCursedWord.getInapropriado();
+        try {
+            ResponseCursedWord responseCursedWord = cursedWordsService.isWordInappropriate(word);
+            return responseCursedWord.getInapropriado();
+        } catch (FeignException ex) {
+            return false;
+        }
     }
 
     private boolean fallbackForInappropriateWord(CursedWord word, Throwable t) {
