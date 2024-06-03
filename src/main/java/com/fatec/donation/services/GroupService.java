@@ -10,10 +10,10 @@ import java.util.UUID;
 public interface GroupService {
     GroupDTO createGroup(CreateGroupRequest request);
     GroupDTO updateGroup(UUID groupId, UpdateGroupRequest request);
-    void deleteGroup(UUID groupId);
+    void deleteGroup(String groupName);
     void createJoinRequest(String groupName);
     void acceptJoinRequest(UUID requestId);
     void rejectJoinRequest(UUID requestId);
-    void blockJoinRequest(UUID groupId, UUID blockedUserId);
-    void unblockJoinRequest(UUID groupId, UUID blockedUserId);
+    void blockJoinRequest(String groupName, String userName);
+    void unblockJoinRequest(String groupName, String userName);
 }

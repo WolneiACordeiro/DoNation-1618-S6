@@ -7,9 +7,7 @@ import com.fatec.donation.domain.mapper.GroupMapper;
 import com.fatec.donation.domain.request.CreateGroupRequest;
 import com.fatec.donation.domain.request.JoinGroupRequest;
 import com.fatec.donation.domain.request.UpdateGroupRequest;
-import com.fatec.donation.exceptions.EntityNotFoundException;
-import com.fatec.donation.exceptions.IllegalStateException;
-import com.fatec.donation.exceptions.UnauthorizedException;
+import com.fatec.donation.exceptions.*;
 import com.fatec.donation.repository.BlockUserJoinRequestRepository;
 import com.fatec.donation.repository.GroupRepository;
 import com.fatec.donation.repository.JoinGroupRequestRepository;
@@ -21,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.lang.IllegalStateException;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -62,8 +61,9 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     @Transactional(transactionManager = "transactionManager")
-    public void deleteGroup(UUID groupId) {
+    public void deleteGroup(String groupName) {
         UUID userId = userService.getUserIdByJwt();
+        UUID groupId = groupRepository.findIdByGroupname(groupName);
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new EntityNotFoundException("Grupo não encontrado"));
         if (!group.getOwner().getId().equals(userId)) {
@@ -98,8 +98,11 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     @Transactional(transactionManager = "transactionManager")
-    public void blockJoinRequest(UUID groupId, UUID blockedUserId) {
+    public void blockJoinRequest(String groupName, String userName) {
         UUID userId = userService.getUserIdByJwt();
+        UUID groupId = groupRepository.findIdByGroupname(groupName);
+        UUID blockedUserId = userRepository.findIdByUsername(userName);
+
         User blockedUser = userRepository.findById(blockedUserId)
                 .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
         Group group = groupRepository.findById(groupId)
@@ -119,8 +122,11 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     @Transactional(transactionManager = "transactionManager")
-    public void unblockJoinRequest(UUID groupId, UUID unblockedUserId) {
+    public void unblockJoinRequest(String groupName, String userName) {
         UUID userId = userService.getUserIdByJwt();
+        UUID groupId = groupRepository.findIdByGroupname(groupName);
+        UUID unblockedUserId = userRepository.findIdByUsername(userName);
+
         User blockedUser = userRepository.findById(unblockedUserId)
                 .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
         Group group = groupRepository.findById(groupId)

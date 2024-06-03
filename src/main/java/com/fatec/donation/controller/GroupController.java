@@ -45,10 +45,10 @@ public class GroupController {
         }
     }
 
-    @DeleteMapping("/{groupId}")
-    public ResponseEntity<Void> deleteGroup(@PathVariable UUID groupId) {
+    @DeleteMapping("/{groupName}")
+    public ResponseEntity<Void> deleteGroup(@PathVariable String groupName) {
         try {
-            groupService.deleteGroup(groupId);
+            groupService.deleteGroup(groupName);
             return ResponseEntity.noContent().build();
         } catch (EntityNotFoundException e) {
             return ResponseEntity.notFound().build();
@@ -57,21 +57,21 @@ public class GroupController {
         }
     }
 
-    @PostMapping("/join/{groupId}")
-    public ResponseEntity<Void> createJoinRequest(@PathVariable UUID groupId) {
-        groupService.createJoinRequest("groupId");
+    @PostMapping("/join/{groupName}")
+    public ResponseEntity<Void> createJoinRequest(@PathVariable String groupName) {
+        groupService.createJoinRequest(groupName);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @PutMapping("/block/{groupId}/{blockedUserId}")
-    public ResponseEntity<Void> blockJoinRequest(@PathVariable UUID groupId, @PathVariable UUID blockedUserId) {
-        groupService.blockJoinRequest(groupId, blockedUserId);
+    @PutMapping("/block/{groupName}/{userName}")
+    public ResponseEntity<Void> blockJoinRequest(@PathVariable String groupName, @PathVariable String userName) {
+        groupService.blockJoinRequest(groupName, userName);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @PutMapping("/unblock/{groupId}/{unblockedUserId}")
-    public ResponseEntity<Void> unblockJoinRequest(@PathVariable UUID groupId, @PathVariable UUID unblockedUserId) {
-        groupService.unblockJoinRequest(groupId, unblockedUserId);
+    @PutMapping("/unblock/{groupName}/{userName}")
+    public ResponseEntity<Void> unblockJoinRequest(@PathVariable String groupName, @PathVariable String userName) {
+        groupService.unblockJoinRequest(groupName, userName);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 

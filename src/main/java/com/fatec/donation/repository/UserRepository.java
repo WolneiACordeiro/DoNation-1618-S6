@@ -1,10 +1,10 @@
 package com.fatec.donation.repository;
 
-import com.fatec.donation.domain.dto.CompleteUserDTO;
 import com.fatec.donation.domain.dto.UserDTO;
 import com.fatec.donation.domain.entity.User;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.neo4j.repository.query.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -16,6 +16,9 @@ public interface UserRepository extends Neo4jRepository<User, UUID> {
     Boolean existsByEmail(String email);
     Optional<UserDTO> findUserDTOById(UUID id);
     Optional<User> findUserByEmail(String email);
-    CompleteUserDTO findCompleteUserDTOById(UUID io);
+
+    @Query("MATCH (g:User {username: $userName}) RETURN g.id")
+    UUID findIdByUsername(@Param("userName") String userName);
+
 
 }
