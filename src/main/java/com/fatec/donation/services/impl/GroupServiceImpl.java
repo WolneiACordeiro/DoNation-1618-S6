@@ -74,10 +74,14 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     @Transactional(transactionManager = "transactionManager")
-    public void createJoinRequest(UUID groupId) {
+    public void createJoinRequest(String groupName) {
         UUID userId = userService.getUserIdByJwt();
+        UUID groupId = groupRepository.findIdByGroupname(groupName);
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new EntityNotFoundException("Grupo não encontrado"));
+        if (blockUserJoinRequestRepository.existsByUserIdAndGroupId(userId, groupId)) {
+            throw new IllegalStateException("Você se encontra bloqueado nesse grupo");
+        }
         if (joinGroupRequestRepository.existsByUserIdAndGroupId(userId, groupId)) {
             throw new IllegalStateException("Você já é membro ou solicitou entrada neste grupo");
         }
@@ -110,6 +114,24 @@ public class GroupServiceImpl implements GroupService {
             throw new IllegalStateException("Esse usuário já se encontra bloqueado");
         }
         group.getBlocked().add(blockedUser);
+        groupRepository.save(group);
+    }
+
+    @Override
+    @Transactional(transactionManager = "transactionManager")
+    public void unblockJoinRequest(UUID groupId, UUID unblockedUserId) {
+        UUID userId = userService.getUserIdByJwt();
+        User blockedUser = userRepository.findById(unblockedUserId)
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new EntityNotFoundException("Grupo não encontrado"));
+        if (!group.getOwner().getId().equals(userId)) {
+            throw new UnauthorizedException("Você não tem permissão para desbloquear alguém neste grupo");
+        }
+        if (!blockUserJoinRequestRepository.existsByUserIdAndGroupId(unblockedUserId, groupId)) {
+            throw new IllegalStateException("Esse usuário não se encontra bloqueado");
+        }
+        group.getBlocked().remove(blockedUser);
         groupRepository.save(group);
     }
 

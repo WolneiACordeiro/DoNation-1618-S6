@@ -21,6 +21,7 @@ public class Group {
     @Id
     private UUID id;
     private String name;
+    private String groupname;
     private String description;
     private String address;
     private LocalDateTime createdAt;

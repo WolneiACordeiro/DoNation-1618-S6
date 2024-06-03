@@ -16,6 +16,7 @@ import java.util.List;
 @Setter
 public class GroupDTO {
     private String name;
+    private String groupname;
     private String description;
     private String address;
     private UserDTO owner;

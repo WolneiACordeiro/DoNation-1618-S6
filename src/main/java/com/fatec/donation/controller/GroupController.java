@@ -59,13 +59,19 @@ public class GroupController {
 
     @PostMapping("/join/{groupId}")
     public ResponseEntity<Void> createJoinRequest(@PathVariable UUID groupId) {
-        groupService.createJoinRequest(groupId);
+        groupService.createJoinRequest("groupId");
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @PostMapping("/block/{groupId}/{blockedUserId}")
+    @PutMapping("/block/{groupId}/{blockedUserId}")
     public ResponseEntity<Void> blockJoinRequest(@PathVariable UUID groupId, @PathVariable UUID blockedUserId) {
         groupService.blockJoinRequest(groupId, blockedUserId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @PutMapping("/unblock/{groupId}/{unblockedUserId}")
+    public ResponseEntity<Void> unblockJoinRequest(@PathVariable UUID groupId, @PathVariable UUID unblockedUserId) {
+        groupService.unblockJoinRequest(groupId, unblockedUserId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
