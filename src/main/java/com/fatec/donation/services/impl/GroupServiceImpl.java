@@ -47,7 +47,8 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     @Transactional(transactionManager = "transactionManager")
-    public GroupDTO updateGroup(UUID groupId, UpdateGroupRequest request) {
+    public GroupDTO updateGroup(String groupName, UpdateGroupRequest request) {
+        UUID groupId = groupRepository.findIdByGroupname(groupName);
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new EntityNotFoundException("Grupo não encontrado"));
         UUID userId = userService.getUserIdByJwt();

@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public interface GroupService {
     GroupDTO createGroup(CreateGroupRequest request);
-    GroupDTO updateGroup(UUID groupId, UpdateGroupRequest request);
+    GroupDTO updateGroup(String groupName, UpdateGroupRequest request);
     void deleteGroup(String groupName);
     void createJoinRequest(String groupName);
     void acceptJoinRequest(UUID requestId);

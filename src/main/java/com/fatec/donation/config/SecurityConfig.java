@@ -49,12 +49,12 @@ public class SecurityConfig {
                     auth.requestMatchers(HttpMethod.PUT, "/api/v1/user/complete-register").hasAnyRole("ADMIN", "USER");
 
                     auth.requestMatchers(HttpMethod.POST, "/api/v1/groups").hasAnyRole("ADMIN", "USER");
-                    auth.requestMatchers(HttpMethod.PUT, "/api/v1/groups/{groupId}").hasAnyRole("ADMIN", "USER");
-                    auth.requestMatchers(HttpMethod.DELETE, "/api/v1/groups/{groupId}").hasAnyRole("ADMIN", "USER");
+                    auth.requestMatchers(HttpMethod.PUT, "/api/v1/groups/{groupName}").hasAnyRole("ADMIN", "USER");
+                    auth.requestMatchers(HttpMethod.DELETE, "/api/v1/groups/{groupName}").hasAnyRole("ADMIN", "USER");
                     auth.requestMatchers(HttpMethod.GET, "/api/v1/groups/authorities").authenticated();
-                    auth.requestMatchers(HttpMethod.POST, "/api/v1/groups/join/{groupId}").hasAnyRole("ADMIN", "USER");
-                    auth.requestMatchers(HttpMethod.PUT, "/api/v1/groups/block/{groupId}/{blockedUserId}").hasAnyRole("ADMIN", "USER");
-                    auth.requestMatchers(HttpMethod.PUT, "/api/v1/groups/unblock/{groupId}/{unblockedUserId}").hasAnyRole("ADMIN", "USER");
+                    auth.requestMatchers(HttpMethod.POST, "/api/v1/groups/join/{groupName}").hasAnyRole("ADMIN", "USER");
+                    auth.requestMatchers(HttpMethod.PUT, "/api/v1/groups/block/{groupName}/{userId}").hasAnyRole("ADMIN", "USER");
+                    auth.requestMatchers(HttpMethod.PUT, "/api/v1/groups/unblock/{groupName}/{userId}").hasAnyRole("ADMIN", "USER");
                     auth.requestMatchers(HttpMethod.PUT, "/api/v1/groups/join/{requestId}/accept").hasAnyRole("ADMIN", "USER");
                     auth.requestMatchers(HttpMethod.PUT, "/api/v1/groups/join/{requestId}/reject").hasAnyRole("ADMIN", "USER");
 

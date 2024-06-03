@@ -33,10 +33,10 @@ public class GroupController {
         return ResponseEntity.status(HttpStatus.CREATED).body(groupCreated);
     }
 
-    @PutMapping("/{groupId}")
-    public ResponseEntity<GroupDTO> updateGroup(@PathVariable UUID groupId, @RequestBody UpdateGroupRequest request) {
+    @PutMapping("/{groupName}")
+    public ResponseEntity<GroupDTO> updateGroup(@PathVariable String groupName, @RequestBody UpdateGroupRequest request) {
         try {
-            GroupDTO updatedGroup = groupService.updateGroup(groupId, request);
+            GroupDTO updatedGroup = groupService.updateGroup(groupName, request);
             return ResponseEntity.ok(updatedGroup);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.notFound().build();
