@@ -7,10 +7,13 @@ import com.fatec.donation.domain.entity.User;
 import com.fatec.donation.domain.mapper.UserMapper;
 import com.fatec.donation.domain.request.CompleteUserRequest;
 import com.fatec.donation.domain.request.CreateUserRequest;
+import com.fatec.donation.jwt.JwtService;
 import com.fatec.donation.services.UserService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +23,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/user")
 @RequiredArgsConstructor
+@Slf4j
 public class UserController {
     private final UserService userService;
     private final UserMapper userMapper;
@@ -31,6 +35,16 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         return ResponseEntity.ok(token);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(HttpServletRequest request) {
+        String token = JwtService.extractTokenFromRequest(request);
+        if (token == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        userService.logout(token);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/register")

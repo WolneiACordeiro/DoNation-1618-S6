@@ -19,6 +19,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
 import java.util.Arrays;
 
@@ -34,7 +37,15 @@ public class SecurityConfig {
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
+    @Bean
+    public UserDetailsService userDetailsService() {
+        InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
+        manager.createUser(User.withUsername("user")
+                .password(passwordEncoder().encode("password"))
+                .roles("USER")
+                .build());
+        return manager;
+    }
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, JwtFilter jwtFilter) throws Exception {
         return httpSecurity
@@ -44,6 +55,7 @@ public class SecurityConfig {
                 .exceptionHandling(e -> e.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers(HttpMethod.POST,"/api/v1/user/auth").permitAll();
+                    auth.requestMatchers(HttpMethod.POST,"/api/v1/user/logout").permitAll();
                     auth.requestMatchers(HttpMethod.POST, "/api/v1/user/register").permitAll();
                     auth.requestMatchers(HttpMethod.GET, "/api/v1/user/profile").hasRole("ADMIN");
                     auth.requestMatchers(HttpMethod.PUT, "/api/v1/user/complete-register").hasAnyRole("ADMIN", "USER");

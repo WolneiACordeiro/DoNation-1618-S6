@@ -16,4 +16,5 @@ public interface UserService {
     UUID getUserIdByJwt();
     ResponseEntity<UserDTO> getUserProfile(UUID userId);
     User completeInfosUser(CompleteUserRequest request, UUID userId);
+    void logout(String token);
 }

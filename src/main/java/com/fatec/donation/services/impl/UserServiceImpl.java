@@ -57,7 +57,16 @@ public class UserServiceImpl implements UserService {
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new IllegalArgumentException("Falha na autenticação.");
         }
+        AccessToken accessToken = jwtService.generateToken(user);
+        if (jwtService.isTokenBlacklisted(accessToken.getAccessToken())) {
+            throw new IllegalArgumentException("Token inválido.");
+        }
         return jwtService.generateToken(user);
+    }
+    @Override
+    @Transactional(transactionManager = "transactionManager")
+    public void logout(String token) {
+        jwtService.blacklistToken(token);
     }
 
     @Override

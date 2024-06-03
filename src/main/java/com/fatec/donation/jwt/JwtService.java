@@ -2,7 +2,11 @@ package com.fatec.donation.jwt;
 
 import com.fatec.donation.domain.entity.AccessToken;
 import com.fatec.donation.domain.entity.User;
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -10,14 +14,13 @@ import org.springframework.stereotype.Service;
 import javax.crypto.SecretKey;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class JwtService {
     private final SecretKeyGenerator keyGenerator;
+    private final Set<String> blacklist = Collections.synchronizedSet(new HashSet<>());
 
     public AccessToken generateToken(User user) {
         SecretKey key = keyGenerator.getKey();
@@ -82,6 +85,14 @@ public class JwtService {
         } catch (Exception e) {
             throw new InvalidTokenException("Invalid token signature");
         }
+    }
+
+    public void blacklistToken(String token) {
+        blacklist.add(token);
+    }
+
+    public boolean isTokenBlacklisted(String token) {
+        return blacklist.contains(token);
     }
 
 }
