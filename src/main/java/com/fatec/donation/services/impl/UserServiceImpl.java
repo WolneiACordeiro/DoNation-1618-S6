@@ -90,6 +90,9 @@ public class UserServiceImpl implements UserService {
     public User completeInfosUser(CompleteUserRequest completeUserRequest, UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
+        if(!user.getFirstAccess()){
+            throw new IllegalArgumentException("Esse não é mais o primeiro acesso do usuário.");
+        }
         userMapper.updateUserWithCompleteInfo(user, completeUserRequest);
         userRepository.save(user);
         return user;
