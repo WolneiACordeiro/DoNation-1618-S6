@@ -17,6 +17,14 @@ public interface GroupRepository extends Neo4jRepository<Group, UUID> {
             "RETURN COUNT(r) > 0 AS blockedRelationExists")
     Boolean blockedByUserNameAndGroupName(@Param("userName") String userName, @Param("groupName") String groupName);
 
+    @Query("MATCH (u:User {id: $userId})-[r:BLOCKED]->(g:Group {groupname: $groupName})" +
+            "RETURN COUNT(r) > 0 AS blockedRelationExists")
+    Boolean blockedByUserIdAndGroupName(@Param("userId") UUID userId, @Param("groupName") String groupName);
+
+    @Query("MATCH (u:User {id: $userId})-[r:MEMBER]->(g:Group {groupname: $groupName})" +
+            "RETURN COUNT(r) > 0 AS memberRelationExists")
+    Boolean memberByUserIdAndGroupName(@Param("userId") UUID userId, @Param("groupName") String groupName);
+
     @Query("MATCH (u:User {username: $userName})-[r:BLOCKED]->(g:Group {groupname: $groupName})" +
             "RETURN COUNT(r) > 0 AS blockedRelationExists")
     Boolean existsByUserIdAndGroupId(@Param("userName") String userName, @Param("groupName") String groupName);

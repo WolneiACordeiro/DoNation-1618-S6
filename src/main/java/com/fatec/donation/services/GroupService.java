@@ -4,6 +4,8 @@ import com.fatec.donation.domain.dto.GroupDTO;
 import com.fatec.donation.domain.entity.Group;
 import com.fatec.donation.domain.request.CreateGroupRequest;
 import com.fatec.donation.domain.request.UpdateGroupRequest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.UUID;
 
@@ -16,4 +18,5 @@ public interface GroupService {
     void rejectJoinRequest(String userName, String groupName);
     void blockJoinRequest(String groupName, String userName);
     void unblockJoinRequest(String groupName, String userName);
+    Page<GroupDTO> getAllGroups(Pageable pageable);
 }

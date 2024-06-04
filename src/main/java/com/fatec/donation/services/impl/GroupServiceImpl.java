@@ -7,19 +7,20 @@ import com.fatec.donation.domain.mapper.GroupMapper;
 import com.fatec.donation.domain.request.CreateGroupRequest;
 import com.fatec.donation.domain.request.JoinGroupRequest;
 import com.fatec.donation.domain.request.UpdateGroupRequest;
-import com.fatec.donation.exceptions.*;
-import com.fatec.donation.repository.BlockUserJoinRequestRepository;
+import com.fatec.donation.exceptions.EntityNotFoundException;
+import com.fatec.donation.exceptions.UnauthorizedException;
 import com.fatec.donation.repository.GroupRepository;
 import com.fatec.donation.repository.JoinGroupRequestRepository;
 import com.fatec.donation.repository.UserRepository;
 import com.fatec.donation.services.GroupService;
 import com.fatec.donation.services.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.lang.IllegalStateException;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -31,7 +32,6 @@ public class GroupServiceImpl implements GroupService {
     private final UserRepository userRepository;
     private final GroupRepository groupRepository;
     private final JoinGroupRequestRepository joinGroupRequestRepository;
-    private final BlockUserJoinRequestRepository blockUserJoinRequestRepository;
     private final PlatformTransactionManager transactionManager;
 
     @Override
@@ -75,16 +75,26 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     @Transactional(transactionManager = "transactionManager")
+    public Page<GroupDTO> getAllGroups(Pageable pageable) {
+        Page<Group> groups = groupRepository.findAll(pageable);
+        return groups.map(groupMapper::toGroupDTO);
+    }
+
+    @Override
+    @Transactional(transactionManager = "transactionManager")
     public void createJoinRequest(String groupName) {
         UUID userId = userService.getUserIdByJwt();
         UUID groupId = groupRepository.findIdByGroupname(groupName);
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new EntityNotFoundException("Grupo não encontrado"));
-        if (blockUserJoinRequestRepository.existsByUserIdAndGroupId(userId, groupId)) {
+        if (groupRepository.blockedByUserIdAndGroupName(userId, groupName)) {
             throw new IllegalStateException("Você se encontra bloqueado nesse grupo");
         }
         if (joinGroupRequestRepository.existsByUserIdAndGroupId(userId, groupId)) {
-            throw new IllegalStateException("Você já é membro ou solicitou entrada neste grupo");
+            throw new IllegalStateException("Você já solicitou entrada neste grupo");
+        }
+        if (groupRepository.memberByUserIdAndGroupName(userId, groupName)) {
+            throw new IllegalStateException("Você já é membro neste grupo");
         }
         if (joinGroupRequestRepository.ownerByUserIdAndGroupId(userId, groupId)) {
             throw new IllegalStateException("Você já é proprietário desse grupo");
@@ -111,7 +121,7 @@ public class GroupServiceImpl implements GroupService {
         if (!group.getOwner().getId().equals(userId)) {
             throw new UnauthorizedException("Você não tem permissão para bloquear alguém neste grupo");
         }
-        if (joinGroupRequestRepository.memberByUserIdAndGroupId(blockedUserId, groupId)) {
+        if (groupRepository.memberByUserIdAndGroupName(blockedUserId, groupName)) {
             throw new IllegalStateException("Você não pode bloquear um membro participante do grupo");
         }
         if (groupRepository.blockedByUserNameAndGroupName(userName, groupName)) {

@@ -7,6 +7,8 @@ import com.fatec.donation.services.GroupService;
 import lombok.RequiredArgsConstructor;
 import org.apache.shiro.authz.UnauthorizedException;
 import org.neo4j.exceptions.EntityNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -25,6 +27,12 @@ public class GroupController {
     public ResponseEntity<String> getAuthorities() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return ResponseEntity.ok(authentication.getAuthorities().toString());
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<Page<GroupDTO>> getAllGroups(Pageable pageable) {
+        Page<GroupDTO> groups = groupService.getAllGroups(pageable);
+        return new ResponseEntity<>(groups, HttpStatus.OK);
     }
 
     @PostMapping
