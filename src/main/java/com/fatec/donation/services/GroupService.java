@@ -12,8 +12,8 @@ public interface GroupService {
     GroupDTO updateGroup(String groupName, UpdateGroupRequest request);
     void deleteGroup(String groupName);
     void createJoinRequest(String groupName);
-    void acceptJoinRequest(UUID requestId);
-    void rejectJoinRequest(UUID requestId);
+    void acceptJoinRequest(String userName, String groupName);
+    void rejectJoinRequest(String userName, String groupName);
     void blockJoinRequest(String groupName, String userName);
     void unblockJoinRequest(String groupName, String userName);
 }

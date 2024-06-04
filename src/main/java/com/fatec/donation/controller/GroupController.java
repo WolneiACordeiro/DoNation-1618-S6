@@ -75,17 +75,16 @@ public class GroupController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @PutMapping("/join/{requestId}/accept")
-    public ResponseEntity<Void> acceptJoinRequest(@PathVariable UUID requestId) {
-        groupService.acceptJoinRequest(requestId);
+    @PutMapping("/join/{userName}/{groupName}/accept")
+    public ResponseEntity<Void> acceptJoinRequest(@PathVariable String userName, @PathVariable String groupName) {
+        groupService.acceptJoinRequest(userName, groupName);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @PutMapping("/join/{requestId}/reject")
-    public ResponseEntity<Void> rejectJoinRequest(@PathVariable UUID requestId) {
-        groupService.rejectJoinRequest(requestId);
+    @PutMapping("/join/{userName}/{groupName}/reject")
+    public ResponseEntity<Void> rejectJoinRequest(@PathVariable String userName, @PathVariable String groupName) {
+        groupService.rejectJoinRequest(userName, groupName);
         return ResponseEntity.noContent().build();
     }
-
 
 }
