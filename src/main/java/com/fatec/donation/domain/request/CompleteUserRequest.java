@@ -16,7 +16,6 @@ public class CompleteUserRequest {
     @Past(message = "A data de nascimento deve ser uma data passada")
     private LocalDate birthday;
     @NotNull(message = "O estado é obrigatório")
-    @CompatibleWithEnum(enumClass = BrazilStates.class, message = "Estado inválido")
     private BrazilStates state;
     @NotBlank(message = "A cidade é obrigatória")
     private String city;

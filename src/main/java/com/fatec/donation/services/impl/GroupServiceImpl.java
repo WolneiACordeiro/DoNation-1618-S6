@@ -114,7 +114,7 @@ public class GroupServiceImpl implements GroupService {
         if (joinGroupRequestRepository.memberByUserIdAndGroupId(blockedUserId, groupId)) {
             throw new IllegalStateException("Você não pode bloquear um membro participante do grupo");
         }
-        if (blockUserJoinRequestRepository.existsByUserIdAndGroupId(blockedUserId, groupId)) {
+        if (groupRepository.blockedByUserNameAndGroupName(userName, groupName)) {
             throw new IllegalStateException("Esse usuário já se encontra bloqueado");
         }
         group.getBlocked().add(blockedUser);
@@ -135,7 +135,7 @@ public class GroupServiceImpl implements GroupService {
         if (!group.getOwner().getId().equals(userId)) {
             throw new UnauthorizedException("Você não tem permissão para desbloquear alguém neste grupo");
         }
-        if (!blockUserJoinRequestRepository.existsByUserIdAndGroupId(unblockedUserId, groupId)) {
+        if (!groupRepository.blockedByUserNameAndGroupName(userName, groupName)) {
             throw new IllegalStateException("Esse usuário não se encontra bloqueado");
         }
         group.getBlocked().remove(blockedUser);
