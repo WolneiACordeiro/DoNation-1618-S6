@@ -99,7 +99,7 @@ public class UserServiceImpl implements UserService {
     public User completeInfosUser(CompleteUserRequest completeUserRequest, UUID userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
-        if(!user.getFirstAccess()){
+        if(Boolean.FALSE.equals(user.getFirstAccess())){
             throw new IllegalArgumentException("Esse não é mais o primeiro acesso do usuário.");
         }
         userMapper.updateUserWithCompleteInfo(user, completeUserRequest);
@@ -118,6 +118,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true, transactionManager = "transactionManager")
+    @Cacheable(value = "userIdsByToken", key = "#token", unless = "#result == null")
     public UUID getUserIdByJwt() {
         String token = JwtService.extractTokenFromRequest(request);
         String email = jwtService.getEmailFromToken(token);
@@ -144,11 +145,10 @@ public class UserServiceImpl implements UserService {
 
         List<CompletableFuture<Boolean>> futures = wordsToCheck.stream()
                 .map(word -> CompletableFuture.supplyAsync(() -> isInappropriateWord(word)))
-                .collect(Collectors.toList());
+                .toList();
 
         boolean hasInappropriateWord = futures.stream()
-                .map(CompletableFuture::join)
-                .anyMatch(result -> result);
+                .anyMatch(CompletableFuture::join);
 
         if (hasInappropriateWord) {
             throw new IllegalArgumentException("O nome ou nome de usuário contém palavras impróprias.");
