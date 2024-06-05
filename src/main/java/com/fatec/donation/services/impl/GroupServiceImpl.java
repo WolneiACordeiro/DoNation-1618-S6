@@ -15,6 +15,8 @@ import com.fatec.donation.repository.UserRepository;
 import com.fatec.donation.services.GroupService;
 import com.fatec.donation.services.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -42,6 +44,7 @@ public class GroupServiceImpl implements GroupService {
                 .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
         Group group = groupMapper.toGroup(request, user);
         Group savedGroup = groupRepository.save(group);
+        evictAllGroupsCache();
         return groupMapper.toGroupDTO(savedGroup);
     }
 
@@ -57,11 +60,18 @@ public class GroupServiceImpl implements GroupService {
         }
         groupMapper.updateGroupWithRequest(group, request);
         Group updatedGroup = groupRepository.save(group);
+        evictAllGroupsCache();
         return groupMapper.toGroupDTO(updatedGroup);
+    }
+
+    @CacheEvict(value = "allGroups", allEntries = true)
+    public void evictAllGroupsCache() {
+        // This method will trigger cache eviction
     }
 
     @Override
     @Transactional(transactionManager = "transactionManager")
+    @CacheEvict(value = "allGroups", allEntries = true)
     public void deleteGroup(String groupName) {
         UUID userId = userService.getUserIdByJwt();
         UUID groupId = groupRepository.findIdByGroupname(groupName);
@@ -73,12 +83,13 @@ public class GroupServiceImpl implements GroupService {
         groupRepository.delete(group);
     }
 
-    @Override
+    @Cacheable(value = "allGroups", key = "#pageable.pageNumber + '-' + #pageable.pageSize")
     @Transactional(transactionManager = "transactionManager")
     public Page<GroupDTO> getAllGroups(Pageable pageable) {
         Page<Group> groups = groupRepository.findAll(pageable);
         return groups.map(groupMapper::toGroupDTO);
     }
+
 
     @Override
     @Transactional(transactionManager = "transactionManager")
@@ -87,13 +98,13 @@ public class GroupServiceImpl implements GroupService {
         UUID groupId = groupRepository.findIdByGroupname(groupName);
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new EntityNotFoundException("Grupo não encontrado"));
-        if (groupRepository.blockedByUserIdAndGroupName(userId, groupName)) {
+        if (Boolean.TRUE.equals(groupRepository.blockedByUserIdAndGroupName(userId, groupName))) {
             throw new IllegalStateException("Você se encontra bloqueado nesse grupo");
         }
         if (joinGroupRequestRepository.existsByUserIdAndGroupId(userId, groupId)) {
             throw new IllegalStateException("Você já solicitou entrada neste grupo");
         }
-        if (groupRepository.memberByUserIdAndGroupName(userId, groupName)) {
+        if (Boolean.TRUE.equals(groupRepository.memberByUserIdAndGroupName(userId, groupName))) {
             throw new IllegalStateException("Você já é membro neste grupo");
         }
         if (joinGroupRequestRepository.ownerByUserIdAndGroupId(userId, groupId)) {
@@ -121,10 +132,10 @@ public class GroupServiceImpl implements GroupService {
         if (!group.getOwner().getId().equals(userId)) {
             throw new UnauthorizedException("Você não tem permissão para bloquear alguém neste grupo");
         }
-        if (groupRepository.memberByUserIdAndGroupName(blockedUserId, groupName)) {
+        if (Boolean.TRUE.equals(groupRepository.memberByUserIdAndGroupName(blockedUserId, groupName))) {
             throw new IllegalStateException("Você não pode bloquear um membro participante do grupo");
         }
-        if (groupRepository.blockedByUserNameAndGroupName(userName, groupName)) {
+        if (Boolean.TRUE.equals(groupRepository.blockedByUserNameAndGroupName(userName, groupName))) {
             throw new IllegalStateException("Esse usuário já se encontra bloqueado");
         }
         group.getBlocked().add(blockedUser);
@@ -145,7 +156,7 @@ public class GroupServiceImpl implements GroupService {
         if (!group.getOwner().getId().equals(userId)) {
             throw new UnauthorizedException("Você não tem permissão para desbloquear alguém neste grupo");
         }
-        if (!groupRepository.blockedByUserNameAndGroupName(userName, groupName)) {
+        if (Boolean.FALSE.equals(groupRepository.blockedByUserNameAndGroupName(userName, groupName))) {
             throw new IllegalStateException("Esse usuário não se encontra bloqueado");
         }
         group.getBlocked().remove(blockedUser);

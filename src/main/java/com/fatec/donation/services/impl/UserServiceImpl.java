@@ -20,6 +20,7 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -45,8 +46,16 @@ public class UserServiceImpl implements UserService {
     private final PlatformTransactionManager transactionManager;
 
     @Override
+    @Cacheable(value = "usersByEmail", key = "#email")
     public User getByEmail(String email) {
         return userRepository.findUserByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado."));
+    }
+
+    @Override
+    @Cacheable(value = "usersByUsername", key = "#username")
+    public User getByUsername(String username) {
+        return userRepository.findUserByEmail(username)
                 .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado."));
     }
 
@@ -99,6 +108,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Cacheable(value = "userProfiles", key = "#userId")
     @Transactional(readOnly = true, transactionManager = "transactionManager")
     public ResponseEntity<UserDTO> getUserProfile(UUID userId) {
         return userRepository.findUserDTOById(userId)
@@ -116,10 +126,12 @@ public class UserServiceImpl implements UserService {
 
     // Métodos auxiliares
 
+    @Cacheable(value = "emailExists", key = "#email")
     private boolean isEmailAlreadyExists(String email) {
         return userRepository.existsByEmail(email);
     }
 
+    @Cacheable(value = "usernameExists", key = "#username")
     private boolean isUsernameAlreadyExists(String username) {
         return userRepository.existsByUsername(username);
     }

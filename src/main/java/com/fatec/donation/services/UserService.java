@@ -11,6 +11,7 @@ import java.util.UUID;
 
 public interface UserService {
     User getByEmail(String email);
+    User getByUsername(String username);
     User createUser(CreateUserRequest request);
     AccessToken authenticate(String email, String password);
     UUID getUserIdByJwt();
