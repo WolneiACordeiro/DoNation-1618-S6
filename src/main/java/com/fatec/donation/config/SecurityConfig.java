@@ -54,7 +54,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configure(httpSecurity))
                 .exceptionHandling(e -> e.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
                 .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers(HttpMethod.POST,"/api/v1/user/auth").permitAll();
+                    auth.requestMatchers(HttpMethod.POST,"/api/v1/user/auth").anonymous();
                     auth.requestMatchers(HttpMethod.POST,"/api/v1/user/logout").authenticated();
                     auth.requestMatchers(HttpMethod.POST, "/api/v1/user/register").permitAll();
                     auth.requestMatchers(HttpMethod.GET, "/api/v1/user/profile").hasRole("ADMIN");
