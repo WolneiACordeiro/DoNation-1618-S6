@@ -34,7 +34,7 @@ public class JwtFilter extends OncePerRequestFilter {
         String token = getToken(request);
         if (token != null) {
             try {
-                if (!jwtService.isTokenBlacklisted(token)) { // Verifica se o token está na lista negra
+                if (!jwtService.isTokenBlacklisted(token)) {
                     String email = jwtService.getEmailFromToken(token);
                     User user = userService.getByEmail(email);
                     setUserAsAuthenticated(user);
@@ -57,7 +57,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         UserDetails userDetails = org.springframework.security.core.userdetails.User
                 .withUsername(user.getEmail())
-                .password(user.getPassword()) // Não é uma boa prática manter a senha no UserDetails
+                .password("N/A")
                 .authorities(authorities)
                 .build();
 

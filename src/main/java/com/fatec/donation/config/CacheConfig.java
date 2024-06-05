@@ -15,7 +15,7 @@ public class CacheConfig {
 
     @Bean
     public CacheManager cacheManager() {
-        CaffeineCacheManager cacheManager = new CaffeineCacheManager("allGroups", "userProfiles", "emailExists", "usersByUsername", "emailExists", "usernameExists", "userIdsByToken");
+        CaffeineCacheManager cacheManager = new CaffeineCacheManager("allGroups", "userProfiles", "emailExists", "usersByUsername", "emailExists", "usernameExists", "usersByEmail");
         cacheManager.setCaffeine(caffeineCacheBuilder());
         return cacheManager;
     }

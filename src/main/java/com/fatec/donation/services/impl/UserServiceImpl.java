@@ -118,7 +118,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true, transactionManager = "transactionManager")
-    @Cacheable(value = "userIdsByToken", key = "#token", unless = "#result == null")
     public UUID getUserIdByJwt() {
         String token = JwtService.extractTokenFromRequest(request);
         String email = jwtService.getEmailFromToken(token);
