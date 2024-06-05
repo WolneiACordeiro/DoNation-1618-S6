@@ -31,8 +31,8 @@ public class GroupController {
             summary = "Get the roles of the authenticated user",
             description = "Retrieve the roles assigned to the authenticated user",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Roles retrieved successfully"),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized")
+                    @ApiResponse(responseCode = "200", description = "OK - Roles retrieved successfully"),
+                    @ApiResponse(responseCode = "401", description = "UNAUTHORIZED - Authentication required")
             }
     )
     @SecurityRequirement(name = "bearerAuth")
@@ -43,11 +43,11 @@ public class GroupController {
     }
 
     @Operation(
-            summary = "Get pageable list of all groups",
+            summary = "Get a pageable list of all groups",
             description = "Retrieve a pageable list of all groups",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "List of groups retrieved successfully"),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized")
+                    @ApiResponse(responseCode = "200", description = "OK - List of groups retrieved successfully"),
+                    @ApiResponse(responseCode = "401", description = "UNAUTHORIZED - Authentication required")
             }
     )
     @SecurityRequirement(name = "bearerAuth")
@@ -61,9 +61,9 @@ public class GroupController {
             summary = "Create a new group",
             description = "Create a new group with the provided details",
             responses = {
-                    @ApiResponse(responseCode = "201", description = "CREATED - Group updated successfully"),
-                    @ApiResponse(responseCode = "401", description = "UNAUTHORIZED - Not authenticated"),
-                    @ApiResponse(responseCode = "422", description = "UNPROCESSABLE ENTITY - Invalid Data")
+                    @ApiResponse(responseCode = "201", description = "CREATED - Group created successfully"),
+                    @ApiResponse(responseCode = "401", description = "UNAUTHORIZED - Authentication required"),
+                    @ApiResponse(responseCode = "422", description = "UNPROCESSABLE ENTITY - Invalid data")
             }
     )
     @SecurityRequirement(name = "bearerAuth")
@@ -78,10 +78,10 @@ public class GroupController {
             description = "Update the details of an existing group",
             responses = {
                     @ApiResponse(responseCode = "200", description = "OK - Group updated successfully"),
-                    @ApiResponse(responseCode = "401", description = "UNAUTHORIZED - Not authenticated"),
-                    @ApiResponse(responseCode = "401", description = "UNAUTHORIZED - You are not the owner of this group"),
+                    @ApiResponse(responseCode = "401", description = "UNAUTHORIZED - Authentication required"),
+                    @ApiResponse(responseCode = "403", description = "FORBIDDEN - You are not the owner of this group"),
                     @ApiResponse(responseCode = "404", description = "NOT FOUND - Group not found"),
-                    @ApiResponse(responseCode = "422", description = "UNPROCESSABLE ENTITY - Invalid Data")
+                    @ApiResponse(responseCode = "422", description = "UNPROCESSABLE ENTITY - Invalid data")
             }
     )
     @SecurityRequirement(name = "bearerAuth")
@@ -93,7 +93,7 @@ public class GroupController {
         } catch (EntityNotFoundException e) {
             return ResponseEntity.notFound().build();
         } catch (UnauthorizedException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
     }
 
@@ -102,8 +102,8 @@ public class GroupController {
             description = "Delete an existing group by its name",
             responses = {
                     @ApiResponse(responseCode = "204", description = "NO CONTENT - Group deleted successfully"),
-                    @ApiResponse(responseCode = "401", description = "UNAUTHORIZED - Not authenticated"),
-                    @ApiResponse(responseCode = "401", description = "UNAUTHORIZED - You are not the owner of this group"),
+                    @ApiResponse(responseCode = "401", description = "UNAUTHORIZED - Authentication required"),
+                    @ApiResponse(responseCode = "403", description = "FORBIDDEN - You are not the owner of this group"),
                     @ApiResponse(responseCode = "404", description = "NOT FOUND - Group not found")
             }
     )
@@ -116,7 +116,7 @@ public class GroupController {
         } catch (EntityNotFoundException e) {
             return ResponseEntity.notFound().build();
         } catch (UnauthorizedException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
     }
 
@@ -124,9 +124,13 @@ public class GroupController {
             summary = "Create a join request for a group",
             description = "Create a join request for a specific group",
             responses = {
-                    @ApiResponse(responseCode = "201", description = "Join request created successfully"),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
-                    @ApiResponse(responseCode = "404", description = "Group not found")
+                    @ApiResponse(responseCode = "201", description = "CREATED - Join request created successfully"),
+                    @ApiResponse(responseCode = "401", description = "UNAUTHORIZED - Authentication required"),
+                    @ApiResponse(responseCode = "403", description = "FORBIDDEN - You are blocked in this group"),
+                    @ApiResponse(responseCode = "409", description = "CONFLICT - You have a pending request in this group"),
+                    @ApiResponse(responseCode = "409", description = "CONFLICT - You are a member of this group"),
+                    @ApiResponse(responseCode = "409", description = "CONFLICT - You are the owner of this group"),
+                    @ApiResponse(responseCode = "404", description = "NOT FOUND - User not found")
             }
     )
     @SecurityRequirement(name = "bearerAuth")
@@ -140,9 +144,11 @@ public class GroupController {
             summary = "Block a join request for a group",
             description = "Block a join request for a specific group and user",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Join request blocked successfully"),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
-                    @ApiResponse(responseCode = "404", description = "Group or user not found")
+                    @ApiResponse(responseCode = "200", description = "OK - Join request blocked successfully"),
+                    @ApiResponse(responseCode = "401", description = "UNAUTHORIZED - Authentication required"),
+                    @ApiResponse(responseCode = "403", description = "FORBIDDEN - You don't have authority to block this user"),
+                    @ApiResponse(responseCode = "409", description = "CONFLICT - This user is already blocked"),
+                    @ApiResponse(responseCode = "404", description = "NOT FOUND - Group or user not found")
             }
     )
     @SecurityRequirement(name = "bearerAuth")
@@ -156,9 +162,11 @@ public class GroupController {
             summary = "Unblock a join request for a group",
             description = "Unblock a join request for a specific group and user",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Join request unblocked successfully"),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
-                    @ApiResponse(responseCode = "404", description = "Group or user not found")
+                    @ApiResponse(responseCode = "200", description = "OK - Join request unblocked successfully"),
+                    @ApiResponse(responseCode = "401", description = "UNAUTHORIZED - Authentication required"),
+                    @ApiResponse(responseCode = "403", description = "FORBIDDEN - This user is not blocked"),
+                    @ApiResponse(responseCode = "404", description = "NOT FOUND - Group not found"),
+                    @ApiResponse(responseCode = "404", description = "NOT FOUND - User not found")
             }
     )
     @SecurityRequirement(name = "bearerAuth")
@@ -172,9 +180,10 @@ public class GroupController {
             summary = "Accept a join request for a group",
             description = "Accept a join request for a specific group and user",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Join request accepted successfully"),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
-                    @ApiResponse(responseCode = "404", description = "Group or user not found")
+                    @ApiResponse(responseCode = "200", description = "OK - Join request accepted successfully"),
+                    @ApiResponse(responseCode = "401", description = "UNAUTHORIZED - Authentication required"),
+                    @ApiResponse(responseCode = "404", description = "NOT FOUND - User not found"),
+                    @ApiResponse(responseCode = "404", description = "NOT FOUND - Group not found")
             }
     )
     @SecurityRequirement(name = "bearerAuth")
@@ -188,9 +197,10 @@ public class GroupController {
             summary = "Reject a join request for a group",
             description = "Reject a join request for a specific group and user",
             responses = {
-                    @ApiResponse(responseCode = "204", description = "Join request rejected successfully"),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized"),
-                    @ApiResponse(responseCode = "404", description = "Group or user not found")
+                    @ApiResponse(responseCode = "204", description = "NO CONTENT - Join request rejected successfully"),
+                    @ApiResponse(responseCode = "401", description = "UNAUTHORIZED - Authentication required"),
+                    @ApiResponse(responseCode = "404", description = "NOT FOUND - User not found"),
+                    @ApiResponse(responseCode = "404", description = "NOT FOUND - Group not found")
             }
     )
     @SecurityRequirement(name = "bearerAuth")
