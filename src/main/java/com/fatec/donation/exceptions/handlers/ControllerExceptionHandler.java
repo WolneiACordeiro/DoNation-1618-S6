@@ -5,6 +5,7 @@ import com.fatec.donation.exceptions.*;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.ValueInstantiationException;
 import com.fatec.donation.exceptions.IllegalArgumentException;
+import com.fatec.donation.exceptions.IllegalStateException;
 import com.fatec.donation.exceptions.errors.CustomError;
 import com.fatec.donation.exceptions.errors.ValidationError;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,8 +17,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-
-import java.lang.IllegalStateException;
 import java.time.Instant;
 
 @RestControllerAdvice

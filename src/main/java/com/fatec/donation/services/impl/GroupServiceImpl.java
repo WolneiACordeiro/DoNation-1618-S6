@@ -8,6 +8,7 @@ import com.fatec.donation.domain.request.CreateGroupRequest;
 import com.fatec.donation.domain.request.JoinGroupRequest;
 import com.fatec.donation.domain.request.UpdateGroupRequest;
 import com.fatec.donation.exceptions.EntityNotFoundException;
+import com.fatec.donation.exceptions.IllegalStateException;
 import com.fatec.donation.exceptions.UnauthorizedException;
 import com.fatec.donation.repository.GroupRepository;
 import com.fatec.donation.repository.JoinGroupRequestRepository;

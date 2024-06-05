@@ -10,6 +10,8 @@ import com.fatec.donation.domain.request.CreateUserRequest;
 import com.fatec.donation.jwt.JwtService;
 import com.fatec.donation.services.UserService;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,7 @@ import java.util.UUID;
 @RequestMapping("/api/v1/user")
 @RequiredArgsConstructor
 @Slf4j
+@Tag(name = "Users", description = "Controller for Users")
 public class UserController {
     private final UserService userService;
     private final UserMapper userMapper;
@@ -37,6 +40,7 @@ public class UserController {
         return ResponseEntity.ok(token);
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletRequest request) {
         String token = JwtService.extractTokenFromRequest(request);
@@ -54,6 +58,7 @@ public class UserController {
         return new ResponseEntity<>(responseUser, HttpStatus.CREATED);
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @PutMapping("/complete-register")
     public ResponseEntity<CompleteUserDTO> firstAccess(@Valid @RequestBody CompleteUserRequest request) {
         UUID userId = userService.getUserIdByJwt();
@@ -62,6 +67,7 @@ public class UserController {
         return new ResponseEntity<>(responseUser, HttpStatus.OK);
     }
 
+    @SecurityRequirement(name = "bearerAuth")
     @GetMapping("/profile")
     public ResponseEntity<UserDTO> getUserProfile() {
         UUID userId = userService.getUserIdByJwt();
