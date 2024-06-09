@@ -6,11 +6,9 @@ import com.fatec.donation.repository.UserRepository;
 import com.fatec.donation.services.UserImagesService;
 import com.fatec.donation.services.UserService;
 import com.fatec.donation.utils.CustomMultipartFile;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -147,14 +145,14 @@ public class UserImagesServiceImpl implements UserImagesService {
             userImage.setImageLink(filePath.toString());
             return userImagesRepository.save(userImage);
         } else {
-            throw new IllegalArgumentException("Image not found with ID: " + id);
+            throw new IllegalArgumentException("Imagem não encontrada com o ID: " + id);
         }
     }
 
 
     public void deleteImage(UUID id) {
         UserImages userImage = userImagesRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Image not found with ID: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Imagem não encontrada com o ID: " + id));
         Path imagePath = Path.of(userImage.getImageLink());
         try {
             Files.deleteIfExists(imagePath);
