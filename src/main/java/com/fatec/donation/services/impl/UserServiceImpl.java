@@ -14,6 +14,7 @@ import com.fatec.donation.exceptions.EntityNotFoundException;
 import com.fatec.donation.exceptions.IllegalArgumentException;
 import com.fatec.donation.jwt.JwtService;
 import com.fatec.donation.repository.UserRepository;
+import com.fatec.donation.services.UserImagesService;
 import com.fatec.donation.services.UserService;
 import feign.FeignException;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -44,6 +46,7 @@ public class UserServiceImpl implements UserService {
     private final HttpServletRequest request;
     private final UserMapper userMapper;
     private final PlatformTransactionManager transactionManager;
+    private  final UserImagesService userImagesService;
 
     @Override
     @Cacheable(value = "usersByEmail", key = "#email")
@@ -80,7 +83,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(transactionManager = "transactionManager")
-    public User createUser(CreateUserRequest createUserRequest) {
+    public User createUser(CreateUserRequest createUserRequest) throws NoSuchAlgorithmException {
         if (isEmailAlreadyExists(createUserRequest.getEmail())) {
             throw new DuplicatedTupleException("Esse email de usuário já se encontra em uso!");
         }
@@ -88,6 +91,7 @@ public class UserServiceImpl implements UserService {
             throw new DuplicatedTupleException("Esse nome de usuário já se encontra em uso!");
         }
         validateInappropriateContent(createUserRequest);
+        createUserRequest.setUserImage(userImagesService.createImage(null, true));
         User newUser = userMapper.toUser(createUserRequest);
         newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
         userRepository.save(newUser);

@@ -8,8 +8,3 @@ spring:
       password: wDqKpcOPAvNvq5cbsp6bt5rL70spbB0lwjvmI70i6P4
     security:
       encrypted: true
-#  cache:
-#    type: caffeine
-#    cache-names: allGroups
-#    caffeine:
-#      spec: maximumSize=500,expireAfterAccess=600s

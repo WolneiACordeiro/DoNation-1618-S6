@@ -7,6 +7,7 @@ import com.fatec.donation.domain.request.CompleteUserRequest;
 import com.fatec.donation.domain.request.CreateUserRequest;
 import com.fatec.donation.repository.GroupRepository;
 import com.fatec.donation.repository.UserRepository;
+import com.fatec.donation.services.UserImagesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -22,12 +23,16 @@ public class UserMapper {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    UserImagesService userImagesService;
+
     public User toUser(CreateUserRequest request) {
         return User.builder()
                 .id(UUID.randomUUID())
                 .name(request.getName())
                 .username(createUniqueUserName(request.getUsername()))
                 .email(request.getEmail())
+                .userImage(request.getUserImage())
                 .firstAccess(true)
                 .password(request.getPassword())
                 .createdAt(LocalDateTime.now())
@@ -53,7 +58,7 @@ public class UserMapper {
     }
 
     public UserDTO toUserDTO(User user) {
-        return new UserDTO(user.getName(), user.getUsername(), user.getEmail(), user.getRoles());
+        return new UserDTO(user.getName(), user.getUsername(), user.getEmail(), user.getUserImage(), user.getRoles());
     }
 
     public CompleteUserDTO toCompleteUserDTO(User user) {

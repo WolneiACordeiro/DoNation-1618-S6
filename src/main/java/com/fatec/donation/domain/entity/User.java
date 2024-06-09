@@ -2,12 +2,14 @@ package com.fatec.donation.domain.entity;
 
 import com.fatec.donation.domain.enums.BrazilStates;
 import com.fatec.donation.domain.enums.Roles;
+import com.fatec.donation.domain.images.UserImages;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
+import org.springframework.data.neo4j.core.schema.Relationship;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -32,6 +34,8 @@ public class User implements UserDetails {
     private String username;
     private String email;
     private String password;
+    @Relationship(type = "PROFILE_IMAGE", direction = Relationship.Direction.INCOMING)
+    private UserImages userImage;
     private String phone;
     private LocalDate birthday;
     private BrazilStates state;

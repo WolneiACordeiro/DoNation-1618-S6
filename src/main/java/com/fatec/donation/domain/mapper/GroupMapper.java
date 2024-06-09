@@ -33,6 +33,7 @@ public class GroupMapper {
                 user.getName(),
                 user.getUsername(),
                 user.getEmail(),
+                user.getUserImage(),
                 user.getRoles()
         );
         groupDTO.setOwner(userDTO);
