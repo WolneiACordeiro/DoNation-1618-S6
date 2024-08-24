@@ -2,9 +2,9 @@ spring:
   application:
     name: donation
   neo4j:
-    uri: neo4j+s://66522652.databases.neo4j.io
+    uri: neo4j+s://5248479d.databases.neo4j.io
     authentication:
       username: neo4j
-      password: wDqKpcOPAvNvq5cbsp6bt5rL70spbB0lwjvmI70i6P4
+      password:
     security:
       encrypted: true
