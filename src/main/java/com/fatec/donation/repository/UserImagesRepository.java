@@ -12,6 +12,10 @@ import java.util.UUID;
 public interface UserImagesRepository extends Neo4jRepository<UserImages, UUID> {
     @Query("MATCH (u:User {id: $userId})<-[:PROFILE_IMAGE]-(img:UserImages) " +
             "RETURN img")
-    Optional<UserImages> findByUserId(UUID userId);
+    Optional<UserImages> findByUserIdProfile(UUID userId);
+
+    @Query("MATCH (u:User {id: $userId})<-[:LANDSCAPE_IMAGE]-(img:UserImages) " +
+            "RETURN img")
+    Optional<UserImages> findByUserIdLandscape(UUID userId);
 }
 

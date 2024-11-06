@@ -22,7 +22,7 @@ public interface UserService {
     UUID getUserIdByJwt();
 
     @Transactional(transactionManager = "transactionManager")
-    User updateUser(UUID userId, UpdateUserRequest updateUserRequest, MultipartFile imageFile) throws IOException;
+    User updateUser(UUID userId, UpdateUserRequest updateUserRequest, MultipartFile imageFile, MultipartFile landscapeFile) throws IOException;
 
     ResponseEntity<UserDTO> getUserProfile(UUID userId);
     User completeInfosUser(CompleteUserRequest request, UUID userId);

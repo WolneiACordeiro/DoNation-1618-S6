@@ -16,5 +16,7 @@ public interface UserImagesService {
 
     UserImages updateOrCreateImageForUser(UUID userId, MultipartFile file) throws IOException;
 
+    UserImages updateOrCreateLandscapeForUser(UUID userId, MultipartFile file) throws IOException;
+
     void deleteImage(UUID id);
 }

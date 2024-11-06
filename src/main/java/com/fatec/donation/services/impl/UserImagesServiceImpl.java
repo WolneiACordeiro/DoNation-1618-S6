@@ -19,17 +19,18 @@ import java.util.UUID;
 @Service
 public class UserImagesServiceImpl implements UserImagesService {
     private final UserImagesRepository userImagesRepository;
-    private final UserRepository userRepository;
 
-    @Value("${images.upload.dir}")
-    private String uploadDir;
+    @Value("${images.profile.dir}")
+    private String profileDir;
 
-    @Value("${images.default.path}")
+    @Value("${images.defaultProfile.path}")
     private String defaultImagePath;
+
+    @Value("${images.defaultLandscape.path}")
+    private String defaultLandscapePath;
 
     public UserImagesServiceImpl(UserImagesRepository userImagesRepository, UserRepository userRepository) {
         this.userImagesRepository = userImagesRepository;
-        this.userRepository = userRepository;
     }
 
     public List<UserImages> listImages() {
@@ -43,17 +44,15 @@ public class UserImagesServiceImpl implements UserImagesService {
     public UserImages updateOrCreateImageForUser(UUID userId, MultipartFile file) throws IOException {
         UserImages userImage;
 
-        // Verifica se o usuário já possui uma imagem
-        Optional<UserImages> imageOptional = userImagesRepository.findByUserId(userId);
-        userImage = imageOptional.orElseGet(UserImages::new); // Novo nó se o usuário for novo e não tiver imagem
+        Optional<UserImages> imageOptional = userImagesRepository.findByUserIdProfile(userId);
+        userImage = imageOptional.orElseGet(UserImages::new);
 
         if (file == null) {
-            // Carrega a imagem padrão se o arquivo de imagem não for fornecido
             Path defaultImage = Path.of(defaultImagePath);
             if (Files.exists(defaultImage)) {
                 String encryptedName = generateEncryptedName("default_image");
                 String fileName = encryptedName + ".jpg";
-                Path uploadPath = Path.of(uploadDir);
+                Path uploadPath = Path.of(profileDir);
                 Files.createDirectories(uploadPath);
                 Path filePath = uploadPath.resolve(fileName);
                 Files.copy(defaultImage, filePath, StandardCopyOption.REPLACE_EXISTING);
@@ -63,12 +62,10 @@ public class UserImagesServiceImpl implements UserImagesService {
                 throw new IllegalArgumentException("Imagem padrão não encontrada em: " + defaultImagePath);
             }
         } else {
-            // Remove a imagem anterior se ela existir
             if (userImage.getImageLink() != null) {
                 Files.deleteIfExists(Path.of(userImage.getImageLink()));
             }
 
-            // Valida a extensão e tamanho do arquivo
             String originalName = file.getOriginalFilename();
             String extension = extractExtension(originalName);
             if (!extension.equalsIgnoreCase("png") && !extension.equalsIgnoreCase("jpg") && !extension.equalsIgnoreCase("jpeg")) {
@@ -78,13 +75,62 @@ public class UserImagesServiceImpl implements UserImagesService {
                 throw new IllegalArgumentException("O arquivo é muito grande. O tamanho máximo permitido é 10MB.");
             }
 
-            // Define o novo nome e salva a nova imagem
             String newName = generateEncryptedName(file.getOriginalFilename());
             userImage.setName(newName + "PIC." + extension);
             String encryptedName = generateEncryptedName(originalName);
             String fileName = encryptedName + "." + extension;
 
-            Path uploadPath = Path.of(uploadDir);
+            Path uploadPath = Path.of(profileDir);
+            Files.createDirectories(uploadPath);
+            Path filePath = uploadPath.resolve(fileName);
+
+            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+            userImage.setImageLink(filePath.toString());
+        }
+
+        return userImagesRepository.save(userImage);
+    }
+
+    public UserImages updateOrCreateLandscapeForUser(UUID userId, MultipartFile file) throws IOException {
+        UserImages userImage;
+
+        Optional<UserImages> imageOptional = userImagesRepository.findByUserIdLandscape(userId);
+        userImage = imageOptional.orElseGet(UserImages::new);
+
+        if (file == null) {
+            Path defaultImage = Path.of(defaultLandscapePath);
+            if (Files.exists(defaultImage)) {
+                String encryptedName = generateEncryptedName("default_landscape");
+                String fileName = encryptedName + ".png";
+                Path uploadPath = Path.of(profileDir);
+                Files.createDirectories(uploadPath);
+                Path filePath = uploadPath.resolve(fileName);
+                Files.copy(defaultImage, filePath, StandardCopyOption.REPLACE_EXISTING);
+                userImage.setName(fileName);
+                userImage.setImageLink(filePath.toString());
+            } else {
+                throw new IllegalArgumentException("Imagem padrão não encontrada em: " + defaultLandscapePath);
+            }
+        } else {
+            if (userImage.getImageLink() != null) {
+                Files.deleteIfExists(Path.of(userImage.getImageLink()));
+            }
+
+            String originalName = file.getOriginalFilename();
+            String extension = extractExtension(originalName);
+            if (!extension.equalsIgnoreCase("png") && !extension.equalsIgnoreCase("jpg") && !extension.equalsIgnoreCase("jpeg")) {
+                throw new IllegalArgumentException("Formato de arquivo inválido. Apenas png, jpg e jpeg são permitidos.");
+            }
+            if (file.getSize() > 10 * 1024 * 1024) {
+                throw new IllegalArgumentException("O arquivo é muito grande. O tamanho máximo permitido é 10MB.");
+            }
+
+            String newName = generateEncryptedName(file.getOriginalFilename());
+            userImage.setName(newName + "LND." + extension);
+            String encryptedName = generateEncryptedName(originalName);
+            String fileName = encryptedName + "." + extension;
+
+            Path uploadPath = Path.of(profileDir);
             Files.createDirectories(uploadPath);
             Path filePath = uploadPath.resolve(fileName);
 

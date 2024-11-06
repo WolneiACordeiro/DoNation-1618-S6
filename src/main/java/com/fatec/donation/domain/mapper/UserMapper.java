@@ -35,6 +35,7 @@ public class UserMapper {
                 .username(createUniqueUserName(request.getUsername()))
                 .email(request.getEmail())
                 .userImage(request.getUserImage())
+                .landscapeImage(request.getLandscapeImage())
                 .firstAccess(true)
                 .password(request.getPassword())
                 .createdAt(LocalDateTime.now())
@@ -63,7 +64,8 @@ public class UserMapper {
         return new UserDTO(user.getName(),
                 user.getUsername(),
                 user.getEmail(),
-                user.getUserImage());
+                user.getUserImage(),
+                user.getLandscapeImage());
     }
 
     public CompleteUserDTO toCompleteUserDTO(User user) {

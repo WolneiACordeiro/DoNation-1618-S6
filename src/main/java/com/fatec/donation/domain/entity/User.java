@@ -36,6 +36,8 @@ public class User implements UserDetails {
     private String password;
     @Relationship(type = "PROFILE_IMAGE", direction = Relationship.Direction.INCOMING)
     private UserImages userImage;
+    @Relationship(type = "LANDSCAPE_IMAGE", direction = Relationship.Direction.INCOMING)
+    private UserImages landscapeImage;
     private String phone;
     private LocalDate birthday;
     private BrazilStates state;

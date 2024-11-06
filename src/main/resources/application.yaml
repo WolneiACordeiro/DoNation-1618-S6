@@ -9,10 +9,12 @@ spring:
     security:
       encrypted: true
 images:
-  upload:
+  profile:
     dir: ./images/users
-  default:
+  defaultProfile:
     path: ./images/default/default.jpg
+  defaultLandscape:
+    path: ./images/default/default_landscape.png
   servlet:
     multipart:
       enabled: true

@@ -94,6 +94,7 @@ public class UserServiceImpl implements UserService {
         }
         validateInappropriateContent(createUserRequest);
         createUserRequest.setUserImage(userImagesService.updateOrCreateImageForUser(null, null));
+        createUserRequest.setLandscapeImage(userImagesService.updateOrCreateLandscapeForUser(null, null));
         User newUser = userMapper.toUser(createUserRequest);
         newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
         userRepository.save(newUser);
@@ -115,15 +116,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(transactionManager = "transactionManager")
-    public User updateUser(UUID userId, UpdateUserRequest updateUserRequest, MultipartFile imageFile) throws IOException {
+    public User updateUser(UUID userId, UpdateUserRequest updateUserRequest, MultipartFile imageFile, MultipartFile landscapeFile) throws IOException {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
 
         if (updateUserRequest.getUsername() != null && !updateUserRequest.getUsername().equals(user.getUsername())) {
-            if (isUsernameAlreadyExists(updateUserRequest.getUsername())) {
+            if (isUsernameAlreadyExists("@" + updateUserRequest.getUsername())) {
                 throw new DuplicatedTupleException("Esse nome de usuário já se encontra em uso!");
             }
-            user.setUsername(updateUserRequest.getUsername());
+            user.setUsername("@" + updateUserRequest.getUsername());
         }
 
         if (updateUserRequest.getName() != null) {
@@ -143,6 +144,17 @@ public class UserServiceImpl implements UserService {
 
             userImage = userImagesService.updateOrCreateImageForUser(userId, imageFile);
             user.setUserImage(userImage);
+        }
+
+        if (landscapeFile != null && !landscapeFile.isEmpty()) {
+            UserImages userImage = user.getUserImage();
+            if (userImage == null) {
+                userImage = new UserImages();
+                user.setLandscapeImage(userImage);
+            }
+
+            userImage = userImagesService.updateOrCreateLandscapeForUser(userId, landscapeFile);
+            user.setLandscapeImage(userImage);
         }
 
         return userRepository.save(user);

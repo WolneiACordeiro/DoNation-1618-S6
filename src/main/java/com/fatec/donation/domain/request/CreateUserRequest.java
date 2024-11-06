@@ -13,6 +13,8 @@ import java.util.Set;
 public class CreateUserRequest {
     @Null
     private UserImages userImage;
+    @Null
+    private UserImages landscapeImage;
     @Size(min = 3, max = 50, message = "Seu nome deve ter entre 3 a 50 caracteres")
     @Pattern(regexp = "^[a-zA-ZÀ-ÿ\\s]*$", message = "Seu nome deve conter apenas letras")
     private String name;
