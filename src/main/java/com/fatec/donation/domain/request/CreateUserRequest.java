@@ -25,6 +25,4 @@ public class CreateUserRequest {
     @Size(min = 8, message = "Senha deve ter 8 caracteres ou mais")
     private String password;
     private LocalDateTime createdAt;
-    @NotEmpty(message = "Campo obrigatório")
-    private Set<Roles> roles;
 }

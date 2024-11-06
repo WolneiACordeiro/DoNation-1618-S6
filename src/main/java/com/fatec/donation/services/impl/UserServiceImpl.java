@@ -6,9 +6,11 @@ import com.fatec.donation.domain.entity.AccessToken;
 import com.fatec.donation.domain.entity.CursedWord;
 import com.fatec.donation.domain.entity.ResponseCursedWord;
 import com.fatec.donation.domain.entity.User;
+import com.fatec.donation.domain.images.UserImages;
 import com.fatec.donation.domain.mapper.UserMapper;
 import com.fatec.donation.domain.request.CompleteUserRequest;
 import com.fatec.donation.domain.request.CreateUserRequest;
+import com.fatec.donation.domain.request.UpdateUserRequest;
 import com.fatec.donation.exceptions.DuplicatedTupleException;
 import com.fatec.donation.exceptions.EntityNotFoundException;
 import com.fatec.donation.exceptions.IllegalArgumentException;
@@ -27,14 +29,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -83,7 +85,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(transactionManager = "transactionManager")
-    public User createUser(CreateUserRequest createUserRequest) throws NoSuchAlgorithmException {
+    public User createUser(CreateUserRequest createUserRequest) throws NoSuchAlgorithmException, IOException {
         if (isEmailAlreadyExists(createUserRequest.getEmail())) {
             throw new DuplicatedTupleException("Esse email de usuário já se encontra em uso!");
         }
@@ -91,7 +93,7 @@ public class UserServiceImpl implements UserService {
             throw new DuplicatedTupleException("Esse nome de usuário já se encontra em uso!");
         }
         validateInappropriateContent(createUserRequest);
-        createUserRequest.setUserImage(userImagesService.createImage(null, true));
+        createUserRequest.setUserImage(userImagesService.updateOrCreateImageForUser(null, null));
         User newUser = userMapper.toUser(createUserRequest);
         newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
         userRepository.save(newUser);
@@ -109,6 +111,41 @@ public class UserServiceImpl implements UserService {
         userMapper.updateUserWithCompleteInfo(user, completeUserRequest);
         userRepository.save(user);
         return user;
+    }
+
+    @Override
+    @Transactional(transactionManager = "transactionManager")
+    public User updateUser(UUID userId, UpdateUserRequest updateUserRequest, MultipartFile imageFile) throws IOException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
+
+        if (updateUserRequest.getUsername() != null && !updateUserRequest.getUsername().equals(user.getUsername())) {
+            if (isUsernameAlreadyExists(updateUserRequest.getUsername())) {
+                throw new DuplicatedTupleException("Esse nome de usuário já se encontra em uso!");
+            }
+            user.setUsername(updateUserRequest.getUsername());
+        }
+
+        if (updateUserRequest.getName() != null) {
+            user.setName(updateUserRequest.getName());
+        }
+
+        if (updateUserRequest.getPassword() != null) {
+            user.setPassword(passwordEncoder.encode(updateUserRequest.getPassword()));
+        }
+
+        if (imageFile != null && !imageFile.isEmpty()) {
+            UserImages userImage = user.getUserImage();
+            if (userImage == null) {
+                userImage = new UserImages();
+                user.setUserImage(userImage);
+            }
+
+            userImage = userImagesService.updateOrCreateImageForUser(userId, imageFile);
+            user.setUserImage(userImage);
+        }
+
+        return userRepository.save(user);
     }
 
     @Override

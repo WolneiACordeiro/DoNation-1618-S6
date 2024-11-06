@@ -3,6 +3,7 @@ package com.fatec.donation.domain.mapper;
 import com.fatec.donation.domain.dto.CompleteUserDTO;
 import com.fatec.donation.domain.dto.UserDTO;
 import com.fatec.donation.domain.entity.User;
+import com.fatec.donation.domain.enums.Roles;
 import com.fatec.donation.domain.request.CompleteUserRequest;
 import com.fatec.donation.domain.request.CreateUserRequest;
 import com.fatec.donation.repository.GroupRepository;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.text.Normalizer;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Random;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -36,7 +38,7 @@ public class UserMapper {
                 .firstAccess(true)
                 .password(request.getPassword())
                 .createdAt(LocalDateTime.now())
-                .roles(request.getRoles())
+                .roles(Collections.singleton(Roles.USER))
                 .build();
     }
 
@@ -58,11 +60,24 @@ public class UserMapper {
     }
 
     public UserDTO toUserDTO(User user) {
-        return new UserDTO(user.getName(), user.getUsername(), user.getEmail(), user.getUserImage(), user.getRoles());
+        return new UserDTO(user.getName(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getUserImage());
     }
 
     public CompleteUserDTO toCompleteUserDTO(User user) {
-        return new CompleteUserDTO(user.getName(), user.getUsername(), user.getEmail(), user.getRoles(), user.getPhone(), user.getBirthday(), user.getState(), user.getCity(), user.getTags(), user.getFirstAccess());
+        return new CompleteUserDTO(
+                user.getName(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getRoles(),
+                user.getPhone(),
+                user.getBirthday(),
+                user.getState(),
+                user.getCity(),
+                user.getTags(),
+                user.getFirstAccess());
     }
 
     public void updateUserWithCompleteInfo(User user, CompleteUserRequest request) {

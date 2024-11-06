@@ -7,6 +7,7 @@ import com.fatec.donation.domain.entity.User;
 import com.fatec.donation.domain.mapper.UserMapper;
 import com.fatec.donation.domain.request.CompleteUserRequest;
 import com.fatec.donation.domain.request.CreateUserRequest;
+import com.fatec.donation.domain.request.UpdateUserRequest;
 import com.fatec.donation.jwt.JwtService;
 import com.fatec.donation.services.UserService;
 
@@ -23,7 +24,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
@@ -44,6 +47,7 @@ public class UserController {
                     @ApiResponse(responseCode = "401", description = "UNAUTHORIZED - Invalid credentials")
             }
     )
+
     @PostMapping("/auth")
     public ResponseEntity<?> signIn(@Valid @RequestBody CredentialsDTO credentialsDTO) {
         var token = userService.authenticate(credentialsDTO.getEmail(), credentialsDTO.getPassword());
@@ -81,7 +85,7 @@ public class UserController {
             }
     )
     @PostMapping("/register")
-    public ResponseEntity<UserDTO> signUp(@Valid @RequestBody CreateUserRequest request) throws NoSuchAlgorithmException {
+    public ResponseEntity<UserDTO> signUp(@Valid @RequestBody CreateUserRequest request) throws NoSuchAlgorithmException, IOException {
         User user = userService.createUser(request);
         UserDTO responseUser = userMapper.toUserDTO(user);
         return new ResponseEntity<>(responseUser, HttpStatus.CREATED);
@@ -101,6 +105,31 @@ public class UserController {
         UUID userId = userService.getUserIdByJwt();
         User user = userService.completeInfosUser(request, userId);
         CompleteUserDTO responseUser = userMapper.toCompleteUserDTO(user);
+        return new ResponseEntity<>(responseUser, HttpStatus.OK);
+    }
+
+    @Operation(
+            summary = "Update user details",
+            description = "Update user information like email, username, password, and image",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "OK - User updated successfully"),
+                    @ApiResponse(responseCode = "400", description = "BAD REQUEST - Invalid input data"),
+                    @ApiResponse(responseCode = "401", description = "UNAUTHORIZED - Invalid token"),
+                    @ApiResponse(responseCode = "404", description = "NOT FOUND - User not found")
+            }
+    )
+    @SecurityRequirement(name = "bearerAuth")
+    @PutMapping("/")
+    public ResponseEntity<UserDTO> updateUser(
+            @RequestPart(value = "updateUserRequest") @Valid UpdateUserRequest updateUserRequest,
+            @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) throws IOException {
+
+        UUID userId = userService.getUserIdByJwt();
+
+        User user = userService.updateUser(userId, updateUserRequest, imageFile);
+
+        UserDTO responseUser = userMapper.toUserDTO(user);
+
         return new ResponseEntity<>(responseUser, HttpStatus.OK);
     }
 

@@ -14,9 +14,7 @@ public interface UserImagesService {
 
     Optional<UserImages> getImageById(UUID id);
 
-    UserImages createImage(MultipartFile file, boolean isDefaultImage) throws NoSuchAlgorithmException;
-
-    UserImages updateImage(UUID id, MultipartFile file) throws IOException;
+    UserImages updateOrCreateImageForUser(UUID userId, MultipartFile file) throws IOException;
 
     void deleteImage(UUID id);
 }

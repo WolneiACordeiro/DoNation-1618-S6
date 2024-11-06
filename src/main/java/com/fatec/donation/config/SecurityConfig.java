@@ -57,7 +57,8 @@ public class SecurityConfig {
                     auth.requestMatchers(HttpMethod.POST,"/api/v1/user/auth").anonymous();
                     auth.requestMatchers(HttpMethod.POST,"/api/v1/user/logout").authenticated();
                     auth.requestMatchers(HttpMethod.POST, "/api/v1/user/register").permitAll();
-                    auth.requestMatchers(HttpMethod.GET, "/api/v1/user/profile").hasRole("ADMIN");
+                    auth.requestMatchers(HttpMethod.PUT, "/api/v1/user/update/{userId}").authenticated();
+                    auth.requestMatchers(HttpMethod.GET, "/api/v1/user/profile").authenticated();
                     auth.requestMatchers(HttpMethod.PUT, "/api/v1/user/complete-register").hasAnyRole("ADMIN", "USER");
 
                     auth.requestMatchers(HttpMethod.POST, "/api/v1/groups").hasAnyRole("ADMIN", "USER");
@@ -79,7 +80,7 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://127.0.0.1:3000", "http://127.0.0.1:8888"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://127.0.0.1:3000", "http://127.0.0.1:8888", "http://localhost:5173"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS", "HEAD"));
         configuration.setAllowCredentials(true);
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Requestor-Type", "Content-Type"));
