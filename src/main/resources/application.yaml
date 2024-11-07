@@ -8,15 +8,28 @@ spring:
       password: ${AURA_PASSWORD}
     security:
       encrypted: true
+  resources:
+    cache:
+      period: 0
+    static-locations: classpath:/static/
+  web:
+    resources:
+      add-mappings: true
+
+server:
+  base:
+    url: http://localhost:8080
+
 images:
   profile:
-    dir: ./images/users
+    dir: src/main/resources/static/images/users
   defaultProfile:
     path: ./images/default/default.jpg
   defaultLandscape:
     path: ./images/default/default_landscape.png
-  servlet:
-    multipart:
-      enabled: true
-      max-file-size: 10MB
-      max-request-size: 10MB
+
+servlet:
+  multipart:
+    enabled: true
+    max-file-size: 10MB
+    max-request-size: 10MB

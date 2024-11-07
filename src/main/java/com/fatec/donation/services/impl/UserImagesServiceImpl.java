@@ -68,6 +68,7 @@ public class UserImagesServiceImpl implements UserImagesService {
 
             String originalName = file.getOriginalFilename();
             String extension = extractExtension(originalName);
+
             if (!extension.equalsIgnoreCase("png") && !extension.equalsIgnoreCase("jpg") && !extension.equalsIgnoreCase("jpeg")) {
                 throw new IllegalArgumentException("Formato de arquivo inválido. Apenas png, jpg e jpeg são permitidos.");
             }
@@ -75,16 +76,16 @@ public class UserImagesServiceImpl implements UserImagesService {
                 throw new IllegalArgumentException("O arquivo é muito grande. O tamanho máximo permitido é 10MB.");
             }
 
-            String newName = generateEncryptedName(file.getOriginalFilename());
-            userImage.setName(newName + "PIC." + extension);
-            String encryptedName = generateEncryptedName(originalName);
-            String fileName = encryptedName + "." + extension;
+            String fileName = generateEncryptedName(file.getOriginalFilename()) + "." + extension;
+            String name = fileName;
 
             Path uploadPath = Path.of(profileDir);
             Files.createDirectories(uploadPath);
             Path filePath = uploadPath.resolve(fileName);
 
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+            userImage.setName(name);
             userImage.setImageLink(filePath.toString());
         }
 
@@ -118,23 +119,26 @@ public class UserImagesServiceImpl implements UserImagesService {
 
             String originalName = file.getOriginalFilename();
             String extension = extractExtension(originalName);
+
             if (!extension.equalsIgnoreCase("png") && !extension.equalsIgnoreCase("jpg") && !extension.equalsIgnoreCase("jpeg")) {
                 throw new IllegalArgumentException("Formato de arquivo inválido. Apenas png, jpg e jpeg são permitidos.");
             }
-            if (file.getSize() > 10 * 1024 * 1024) {
+            if (file.getSize() > 10 * 1024 * 1024) { // Verificar o tamanho do arquivo
                 throw new IllegalArgumentException("O arquivo é muito grande. O tamanho máximo permitido é 10MB.");
             }
 
-            String newName = generateEncryptedName(file.getOriginalFilename());
-            userImage.setName(newName + "LND." + extension);
-            String encryptedName = generateEncryptedName(originalName);
-            String fileName = encryptedName + "." + extension;
+            String fileName = generateEncryptedName(file.getOriginalFilename()) + "." + extension;
+
+            String name = fileName;
 
             Path uploadPath = Path.of(profileDir);
             Files.createDirectories(uploadPath);
+
             Path filePath = uploadPath.resolve(fileName);
 
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+            userImage.setName(name);
             userImage.setImageLink(filePath.toString());
         }
 
