@@ -14,6 +14,7 @@ import com.fatec.donation.domain.request.UpdateUserRequest;
 import com.fatec.donation.exceptions.DuplicatedTupleException;
 import com.fatec.donation.exceptions.EntityNotFoundException;
 import com.fatec.donation.exceptions.IllegalArgumentException;
+import com.fatec.donation.exceptions.ResourceNotFoundException;
 import com.fatec.donation.jwt.JwtService;
 import com.fatec.donation.repository.UserRepository;
 import com.fatec.donation.services.UserImagesService;
@@ -175,6 +176,13 @@ public class UserServiceImpl implements UserService {
         String token = JwtService.extractTokenFromRequest(request);
         String email = jwtService.getEmailFromToken(token);
         return getByEmail(email).getId();
+    }
+
+    @Override
+    @Transactional(readOnly = true, transactionManager = "transactionManager")
+    public User getUserById(UUID userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com o ID: " + userId));
     }
 
     // Métodos auxiliares

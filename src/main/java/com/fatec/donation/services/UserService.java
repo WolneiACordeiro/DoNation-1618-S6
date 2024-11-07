@@ -20,10 +20,9 @@ public interface UserService {
     User createUser(CreateUserRequest request) throws NoSuchAlgorithmException, IOException;
     AccessToken authenticate(String email, String password);
     UUID getUserIdByJwt();
-
+    User getUserById(UUID userId);
     @Transactional(transactionManager = "transactionManager")
     User updateUser(UUID userId, UpdateUserRequest updateUserRequest, MultipartFile imageFile, MultipartFile landscapeFile) throws IOException;
-
     ResponseEntity<UserDTO> getUserProfile(UUID userId);
     User completeInfosUser(CompleteUserRequest request, UUID userId);
     void logout(String token);

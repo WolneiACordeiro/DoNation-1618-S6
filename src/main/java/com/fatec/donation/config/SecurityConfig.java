@@ -59,7 +59,8 @@ public class SecurityConfig {
                     auth.requestMatchers(HttpMethod.POST, "/api/v1/user/register").permitAll();
                     auth.requestMatchers(HttpMethod.PUT, "/api/v1/user/update/{userId}").authenticated();
                     auth.requestMatchers(HttpMethod.GET, "/api/v1/user/profile").authenticated();
-                    auth.requestMatchers(HttpMethod.PUT, "/api/v1/user/complete-register").hasAnyRole("ADMIN", "USER");
+                    auth.requestMatchers(HttpMethod.GET, "/api/v1/user/check-access").authenticated();
+                    auth.requestMatchers(HttpMethod.PUT, "/api/v1/user/complete-register").authenticated();
 
                     auth.requestMatchers(HttpMethod.POST, "/api/v1/groups").hasAnyRole("ADMIN", "USER");
                     auth.requestMatchers(HttpMethod.PUT, "/api/v1/groups/{groupName}").hasAnyRole("ADMIN", "USER");

@@ -1,6 +1,7 @@
 package com.fatec.donation.domain.mapper;
 
 import com.fatec.donation.domain.dto.CompleteUserDTO;
+import com.fatec.donation.domain.dto.FAccessUserDTO;
 import com.fatec.donation.domain.dto.UserDTO;
 import com.fatec.donation.domain.entity.User;
 import com.fatec.donation.domain.enums.Roles;
@@ -61,7 +62,8 @@ public class UserMapper {
     }
 
     public UserDTO toUserDTO(User user) {
-        return new UserDTO(user.getName(),
+        return new UserDTO(
+                user.getName(),
                 user.getUsername(),
                 user.getEmail(),
                 user.getUserImage(),
@@ -79,6 +81,11 @@ public class UserMapper {
                 user.getState(),
                 user.getCity(),
                 user.getTags(),
+                user.getFirstAccess());
+    }
+
+    public FAccessUserDTO toFAccessUserDTO(User user) {
+        return new FAccessUserDTO(
                 user.getFirstAccess());
     }
 

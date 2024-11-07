@@ -2,6 +2,7 @@ package com.fatec.donation.controller;
 
 import com.fatec.donation.domain.dto.CompleteUserDTO;
 import com.fatec.donation.domain.dto.CredentialsDTO;
+import com.fatec.donation.domain.dto.FAccessUserDTO;
 import com.fatec.donation.domain.dto.UserDTO;
 import com.fatec.donation.domain.entity.User;
 import com.fatec.donation.domain.mapper.UserMapper;
@@ -92,6 +93,23 @@ public class UserController {
     }
 
     @Operation(
+            summary = "Check user's first access",
+            description = "Verifies if this is the user's first access based on provided information. If it is, the system may require additional data for registration completion.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "OK - First access confirmed successfully"),
+                    @ApiResponse(responseCode = "401", description = "UNAUTHORIZED - Invalid or missing token")
+            }
+    )
+    @SecurityRequirement(name = "bearerAuth")
+    @GetMapping("/check-access")
+    public ResponseEntity<FAccessUserDTO> firstAccessCheckout() {
+        UUID userId = userService.getUserIdByJwt();
+        User user = userService.getUserById(userId);
+        FAccessUserDTO responseUser = userMapper.toFAccessUserDTO(user);
+        return new ResponseEntity<>(responseUser, HttpStatus.OK);
+    }
+
+    @Operation(
             summary = "Complete user registration",
             description = "Complete the user's registration with additional information",
             responses = {
@@ -145,6 +163,8 @@ public class UserController {
     @GetMapping("/profile")
     public ResponseEntity<UserDTO> getUserProfile() {
         UUID userId = userService.getUserIdByJwt();
-        return userService.getUserProfile(userId);
+        User user = userService.getUserById(userId);
+        UserDTO responseUser = userMapper.toUserDTO(user);
+        return new ResponseEntity<>(responseUser, HttpStatus.OK);
     }
 }
