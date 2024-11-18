@@ -23,10 +23,16 @@ server:
 images:
   profile:
     dir: src/main/resources/static/images/users
+  groups:
+    dir: src/main/resources/static/images/groups
   defaultProfile:
-    path: ./images/default/default.jpg
+    path: ./images/default/default.png
+  defaultProfileGroup:
+    path: ./images/default/group_default.png
   defaultLandscape:
     path: ./images/default/default_landscape.png
+  defaultLandscapeGroup:
+    path: ./images/default/group_default_landscape.png
 
 servlet:
   multipart:

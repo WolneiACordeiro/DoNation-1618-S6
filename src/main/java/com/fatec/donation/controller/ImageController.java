@@ -1,5 +1,7 @@
 package com.fatec.donation.controller;
 
+import com.fatec.donation.domain.images.UserImages;
+import com.fatec.donation.services.UserImagesService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.FileSystemResource;
@@ -14,13 +16,15 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/images")
 @RequiredArgsConstructor
 @Tag(name = "Images", description = "Controller for managing images")
 public class ImageController {
+
+    private final UserImagesService userImagesService;
 
     @GetMapping("/users/{filename}")
     public ResponseEntity<Resource> getImage(@PathVariable String filename) throws IOException {
@@ -40,6 +44,13 @@ public class ImageController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_TYPE, contentType)
                 .body(resource);
+    }
+
+    @GetMapping("/users/images")
+    public ResponseEntity<List<UserImages>> listImages() {
+        List<UserImages> images = userImagesService.listImages();
+        userImagesService.quickSort(images, 0, images.size() - 1);
+        return ResponseEntity.ok(images);
     }
 
 }

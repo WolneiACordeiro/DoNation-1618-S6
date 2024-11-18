@@ -1,9 +1,9 @@
 package com.fatec.donation.services.impl;
 
-import com.fatec.donation.domain.images.UserImages;
-import com.fatec.donation.repository.UserImagesRepository;
+import com.fatec.donation.domain.images.GroupImages;
+import com.fatec.donation.repository.GroupImagesRepository;
 import com.fatec.donation.repository.UserRepository;
-import com.fatec.donation.services.UserImagesService;
+import com.fatec.donation.services.GroupImagesService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,27 +17,27 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
-public class UserImagesServiceImpl implements UserImagesService {
-    private final UserImagesRepository userImagesRepository;
+public class GroupImagesServiceImpl implements GroupImagesService {
+    private final GroupImagesRepository groupImagesRepository;
 
-    @Value("${images.profile.dir}")
+    @Value("${images.groups.dir}")
     private String profileDir;
 
-    @Value("${images.defaultProfile.path}")
+    @Value("${images.defaultProfileGroup.path}")
     private String defaultImagePath;
 
-    @Value("${images.defaultLandscape.path}")
+    @Value("${images.defaultLandscapeGroup.path}")
     private String defaultLandscapePath;
 
-    public UserImagesServiceImpl(UserImagesRepository userImagesRepository, UserRepository userRepository) {
-        this.userImagesRepository = userImagesRepository;
+    public GroupImagesServiceImpl(GroupImagesRepository groupImagesRepository, UserRepository userRepository) {
+        this.groupImagesRepository = groupImagesRepository;
     }
 
-    public List<UserImages> listImages() {
-        return userImagesRepository.findAll();
+    public List<GroupImages> listImages() {
+        return groupImagesRepository.findAll();
     }
 
-    public void quickSort(List<UserImages> images, int low, int high) {
+    public void quickSort(List<GroupImages> images, int low, int high) {
         if (low < high) {
             int pi = partition(images, low, high);
             quickSort(images, low, pi - 1);
@@ -45,8 +45,8 @@ public class UserImagesServiceImpl implements UserImagesService {
         }
     }
 
-    private int partition(List<UserImages> images, int low, int high) {
-        UserImages pivot = images.get(high);
+    private int partition(List<GroupImages> images, int low, int high) {
+        GroupImages pivot = images.get(high);
         int i = low - 1;
 
         for (int j = low; j < high; j++) {
@@ -59,21 +59,21 @@ public class UserImagesServiceImpl implements UserImagesService {
         return i + 1;
     }
 
-    private void swap(List<UserImages> images, int i, int j) {
-        UserImages temp = images.get(i);
+    private void swap(List<GroupImages> images, int i, int j) {
+        GroupImages temp = images.get(i);
         images.set(i, images.get(j));
         images.set(j, temp);
     }
 
-    public Optional<UserImages> getImageById(UUID id) {
-        return userImagesRepository.findById(id);
+    public Optional<GroupImages> getImageById(UUID id) {
+        return groupImagesRepository.findById(id);
     }
 
-    public UserImages updateOrCreateImageForUser(UUID userId, MultipartFile file) throws IOException {
-        UserImages userImage;
+    public GroupImages updateOrCreateImageForGroup(UUID groupId, MultipartFile file) throws IOException {
+        GroupImages groupImage;
 
-        Optional<UserImages> imageOptional = userImagesRepository.findByUserIdProfile(userId);
-        userImage = imageOptional.orElseGet(UserImages::new);
+        Optional<GroupImages> imageOptional = groupImagesRepository.findByGroupIdProfile(groupId);
+        groupImage = imageOptional.orElseGet(GroupImages::new);
 
         if (file == null) {
             Path defaultImage = Path.of(defaultImagePath);
@@ -84,14 +84,14 @@ public class UserImagesServiceImpl implements UserImagesService {
                 Files.createDirectories(uploadPath);
                 Path filePath = uploadPath.resolve(fileName);
                 Files.copy(defaultImage, filePath, StandardCopyOption.REPLACE_EXISTING);
-                userImage.setName(fileName);
-                userImage.setImageLink(filePath.toString());
+                groupImage.setName(fileName);
+                groupImage.setImageLink(filePath.toString());
             } else {
                 throw new IllegalArgumentException("Imagem padrão não encontrada em: " + defaultImagePath);
             }
         } else {
-            if (userImage.getImageLink() != null) {
-                Files.deleteIfExists(Path.of(userImage.getImageLink()));
+            if (groupImage.getImageLink() != null) {
+                Files.deleteIfExists(Path.of(groupImage.getImageLink()));
             }
 
             String originalName = file.getOriginalFilename();
@@ -113,18 +113,18 @@ public class UserImagesServiceImpl implements UserImagesService {
 
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-            userImage.setName(name);
-            userImage.setImageLink(filePath.toString());
+            groupImage.setName(name);
+            groupImage.setImageLink(filePath.toString());
         }
 
-        return userImagesRepository.save(userImage);
+        return groupImagesRepository.save(groupImage);
     }
 
-    public UserImages updateOrCreateLandscapeForUser(UUID userId, MultipartFile file) throws IOException {
-        UserImages userImage;
+    public GroupImages updateOrCreateLandscapeForGroup(UUID userId, MultipartFile file) throws IOException {
+        GroupImages groupImage;
 
-        Optional<UserImages> imageOptional = userImagesRepository.findByUserIdLandscape(userId);
-        userImage = imageOptional.orElseGet(UserImages::new);
+        Optional<GroupImages> imageOptional = groupImagesRepository.findByGroupIdLandscape(userId);
+        groupImage = imageOptional.orElseGet(GroupImages::new);
 
         if (file == null) {
             Path defaultImage = Path.of(defaultLandscapePath);
@@ -135,14 +135,14 @@ public class UserImagesServiceImpl implements UserImagesService {
                 Files.createDirectories(uploadPath);
                 Path filePath = uploadPath.resolve(fileName);
                 Files.copy(defaultImage, filePath, StandardCopyOption.REPLACE_EXISTING);
-                userImage.setName(fileName);
-                userImage.setImageLink(filePath.toString());
+                groupImage.setName(fileName);
+                groupImage.setImageLink(filePath.toString());
             } else {
                 throw new IllegalArgumentException("Imagem padrão não encontrada em: " + defaultLandscapePath);
             }
         } else {
-            if (userImage.getImageLink() != null) {
-                Files.deleteIfExists(Path.of(userImage.getImageLink()));
+            if (groupImage.getImageLink() != null) {
+                Files.deleteIfExists(Path.of(groupImage.getImageLink()));
             }
 
             String originalName = file.getOriginalFilename();
@@ -166,24 +166,24 @@ public class UserImagesServiceImpl implements UserImagesService {
 
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-            userImage.setName(name);
-            userImage.setImageLink(filePath.toString());
+            groupImage.setName(name);
+            groupImage.setImageLink(filePath.toString());
         }
 
-        return userImagesRepository.save(userImage);
+        return groupImagesRepository.save(groupImage);
     }
 
 
     public void deleteImage(UUID id) {
-        UserImages userImage = userImagesRepository.findById(id)
+        GroupImages groupImage = groupImagesRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Imagem não encontrada com o ID: " + id));
-        Path imagePath = Path.of(userImage.getImageLink());
+        Path imagePath = Path.of(groupImage.getImageLink());
         try {
             Files.deleteIfExists(imagePath);
         } catch (IOException e) {
             throw new RuntimeException("Erro ao deletar a imagem: " + e.getMessage());
         }
-        userImagesRepository.delete(userImage);
+        groupImagesRepository.delete(groupImage);
     }
 
     private String extractExtension(String fileName) {

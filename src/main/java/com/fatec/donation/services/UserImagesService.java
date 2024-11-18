@@ -18,6 +18,8 @@ public interface UserImagesService {
 
     UserImages updateOrCreateLandscapeForUser(UUID userId, MultipartFile file) throws IOException;
 
+    void quickSort(List<UserImages> images, int low, int high);
+
     void deleteImage(UUID id);
 
 }

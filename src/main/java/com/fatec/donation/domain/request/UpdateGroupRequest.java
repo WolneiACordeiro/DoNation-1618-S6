@@ -1,5 +1,6 @@
 package com.fatec.donation.domain.request;
 
+import com.fatec.donation.domain.images.GroupImages;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import jakarta.validation.constraints.*;
@@ -15,4 +16,6 @@ public class UpdateGroupRequest {
     @NotBlank(message = "Endereço é obrigatório")
     @Size(max = 200, message = "Endereço deve ter no máximo 200 caracteres")
     private String address;
+    private GroupImages groupImage;
+    private GroupImages landscapeImage;
 }

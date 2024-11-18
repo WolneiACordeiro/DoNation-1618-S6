@@ -1,5 +1,7 @@
 package com.fatec.donation.domain.entity;
 
+import com.fatec.donation.domain.images.GroupImages;
+import com.fatec.donation.domain.images.UserImages;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,6 +33,10 @@ public class Group {
     private Set<User> member;
     @Relationship(type = "BLOCKED", direction = Relationship.Direction.INCOMING)
     private Set<User> blocked;
+    @Relationship(type = "PROFILE_IMAGE", direction = Relationship.Direction.INCOMING)
+    private GroupImages groupImage;
+    @Relationship(type = "LANDSCAPE_IMAGE", direction = Relationship.Direction.INCOMING)
+    private GroupImages landscapeImage;
     public Group() {
         this.id = UUID.randomUUID();
     }

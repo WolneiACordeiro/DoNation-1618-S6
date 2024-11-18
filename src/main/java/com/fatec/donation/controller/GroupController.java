@@ -3,11 +3,13 @@ package com.fatec.donation.controller;
 import com.fatec.donation.domain.dto.GroupDTO;
 import com.fatec.donation.domain.request.CreateGroupRequest;
 import com.fatec.donation.domain.request.UpdateGroupRequest;
+import com.fatec.donation.domain.request.UpdateUserRequest;
 import com.fatec.donation.services.GroupService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.shiro.authz.UnauthorizedException;
 import org.neo4j.exceptions.EntityNotFoundException;
@@ -19,6 +21,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/v1/groups")
@@ -68,7 +73,7 @@ public class GroupController {
     )
     @SecurityRequirement(name = "bearerAuth")
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<GroupDTO> createGroup(@RequestBody CreateGroupRequest request) {
+    public ResponseEntity<GroupDTO> createGroup(@RequestBody CreateGroupRequest request) throws IOException {
         GroupDTO groupCreated = groupService.createGroup(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(groupCreated);
     }
@@ -85,15 +90,21 @@ public class GroupController {
             }
     )
     @SecurityRequirement(name = "bearerAuth")
-    @PutMapping(value = "/{groupName}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<GroupDTO> updateGroup(@PathVariable String groupName, @RequestBody UpdateGroupRequest request) {
+    @PutMapping(value = "/{groupName}")
+    public ResponseEntity<GroupDTO> updateGroup(
+            @PathVariable String groupName,
+            @RequestPart(value = "updateGroupRequest") @Valid UpdateGroupRequest request,
+            @RequestPart(value = "imageFile", required = false) MultipartFile imageFile,
+            @RequestPart(value = "landscapeFile", required = false) MultipartFile landscapeFile) {
         try {
-            GroupDTO updatedGroup = groupService.updateGroup(groupName, request);
+            GroupDTO updatedGroup = groupService.updateGroup(groupName, request, imageFile, landscapeFile);
             return ResponseEntity.ok(updatedGroup);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.notFound().build();
         } catch (UnauthorizedException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

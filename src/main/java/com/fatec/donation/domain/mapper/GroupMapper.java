@@ -7,9 +7,12 @@ import com.fatec.donation.domain.entity.User;
 import com.fatec.donation.domain.request.CreateGroupRequest;
 import com.fatec.donation.domain.request.UpdateGroupRequest;
 import com.fatec.donation.repository.GroupRepository;
+import com.fatec.donation.services.GroupImagesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.text.Normalizer;
 import java.time.LocalDateTime;
 import java.util.Random;
@@ -21,6 +24,7 @@ public class GroupMapper {
 
     @Autowired
     GroupRepository groupRepository;
+    GroupImagesService groupImagesService;
 
     public GroupDTO toGroupDTO(Group group) {
         GroupDTO groupDTO = new GroupDTO();
@@ -40,7 +44,7 @@ public class GroupMapper {
         return groupDTO;
     }
 
-    public Group toGroup(CreateGroupRequest request, User owner) {
+    public Group toGroup(CreateGroupRequest request, User owner) throws IOException {
         return Group.builder()
         .id(UUID.randomUUID())
         .name(request.getName())
@@ -48,6 +52,8 @@ public class GroupMapper {
         .description(request.getDescription())
         .address(request.getAddress())
         .createdAt(LocalDateTime.now())
+        .groupImage(request.getGroupImage())
+        .landscapeImage(request.getLandscapeImage())
         .owner(owner)
         .build();
     }
@@ -73,5 +79,7 @@ public class GroupMapper {
         group.setName(request.getName());
         group.setDescription(request.getDescription());
         group.setAddress(request.getAddress());
+        group.setGroupImage(request.getGroupImage());
+        group.setLandscapeImage(request.getLandscapeImage());
     }
 }

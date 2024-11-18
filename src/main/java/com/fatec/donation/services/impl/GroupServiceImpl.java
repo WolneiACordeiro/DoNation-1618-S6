@@ -3,6 +3,7 @@ package com.fatec.donation.services.impl;
 import com.fatec.donation.domain.dto.GroupDTO;
 import com.fatec.donation.domain.entity.Group;
 import com.fatec.donation.domain.entity.User;
+import com.fatec.donation.domain.images.GroupImages;
 import com.fatec.donation.domain.mapper.GroupMapper;
 import com.fatec.donation.domain.request.CreateGroupRequest;
 import com.fatec.donation.domain.request.JoinGroupRequest;
@@ -13,6 +14,7 @@ import com.fatec.donation.exceptions.UnauthorizedException;
 import com.fatec.donation.repository.GroupRepository;
 import com.fatec.donation.repository.JoinGroupRequestRepository;
 import com.fatec.donation.repository.UserRepository;
+import com.fatec.donation.services.GroupImagesService;
 import com.fatec.donation.services.GroupService;
 import com.fatec.donation.services.UserService;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +25,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -31,6 +35,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class GroupServiceImpl implements GroupService {
     private final UserService userService;
+    private final GroupImagesService groupImagesService;
     private final GroupMapper groupMapper;
     private final UserRepository userRepository;
     private final GroupRepository groupRepository;
@@ -39,10 +44,12 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     @Transactional(transactionManager = "transactionManager")
-    public GroupDTO createGroup(CreateGroupRequest request) {
+    public GroupDTO createGroup(CreateGroupRequest request) throws IOException {
         UUID userId = userService.getUserIdByJwt();
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
+        request.setGroupImage(groupImagesService.updateOrCreateImageForGroup(null, null));
+        request.setLandscapeImage(groupImagesService.updateOrCreateLandscapeForGroup(null, null));
         Group group = groupMapper.toGroup(request, user);
         Group savedGroup = groupRepository.save(group);
         evictAllGroupsCache();
@@ -51,7 +58,7 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     @Transactional(transactionManager = "transactionManager")
-    public GroupDTO updateGroup(String groupName, UpdateGroupRequest request) {
+    public GroupDTO updateGroup(String groupName, UpdateGroupRequest request, MultipartFile imageFile, MultipartFile landscapeFile) throws IOException {
         UUID groupId = groupRepository.findIdByGroupname(groupName);
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new EntityNotFoundException("Grupo não encontrado"));
@@ -59,7 +66,31 @@ public class GroupServiceImpl implements GroupService {
         if (!group.getOwner().getId().equals(userId)) {
             throw new UnauthorizedException("Você não tem permissão para atualizar este grupo");
         }
+
         groupMapper.updateGroupWithRequest(group, request);
+
+        if (imageFile != null && !imageFile.isEmpty()) {
+            GroupImages groupImage = group.getGroupImage();
+            if (groupImage == null) {
+                groupImage = new GroupImages();
+                group.setGroupImage(groupImage);
+            }
+
+            groupImage = groupImagesService.updateOrCreateImageForGroup(groupId, imageFile);
+            group.setGroupImage(groupImage);
+        }
+
+        if (landscapeFile != null && !landscapeFile.isEmpty()) {
+            GroupImages groupImage = group.getLandscapeImage();
+            if (groupImage == null) {
+                groupImage = new GroupImages();
+                group.setLandscapeImage(groupImage);
+            }
+
+            groupImage = groupImagesService.updateOrCreateLandscapeForGroup(groupId, landscapeFile);
+            group.setLandscapeImage(groupImage);
+        }
+
         Group updatedGroup = groupRepository.save(group);
         evictAllGroupsCache();
         return groupMapper.toGroupDTO(updatedGroup);

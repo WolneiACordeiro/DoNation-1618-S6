@@ -140,7 +140,9 @@ public class UserController {
     @PutMapping("/")
     public ResponseEntity<UserDTO> updateUser(
             @RequestPart(value = "updateUserRequest") @Valid UpdateUserRequest updateUserRequest,
-            @RequestParam(value = "imageFile", required = false) MultipartFile imageFile, @RequestParam(value = "landscapeFile", required = false) MultipartFile landscapeFile) throws IOException {
+            @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
+            @RequestParam(value = "landscapeFile", required = false) MultipartFile landscapeFile
+    ) throws IOException {
 
         UUID userId = userService.getUserIdByJwt();
 
