@@ -32,6 +32,10 @@ public class GroupMapper {
         groupDTO.setGroupname(group.getGroupname());
         groupDTO.setDescription(group.getDescription());
         groupDTO.setAddress(group.getAddress());
+
+        groupDTO.setGroupImage(group.getGroupImage());
+        groupDTO.setLandscapeImage(group.getLandscapeImage());
+
         User user = group.getOwner();
         UserDTO userDTO = new UserDTO(
                 user.getName(),
