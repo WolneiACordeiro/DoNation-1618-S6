@@ -16,7 +16,12 @@ public interface UserRepository extends Neo4jRepository<User, UUID> {
     Boolean existsByEmail(String email);
     Optional<UserDTO> findUserDTOById(UUID id);
     Optional<User> findUserByEmail(String email);
+
+    @Query("MATCH (g:Group)-[:OWNER]->(u:User) WHERE g.id = $groupId RETURN u")
+    User findOwnerByGroupId(@Param("groupId") UUID groupId);
+
     Optional<User> findUserByUsername(String username);
+
     String getUsernameById(UUID id);
 
     @Query("MATCH (g:User {username: $userName}) RETURN g.id")

@@ -66,8 +66,8 @@ public class UserMapper {
                 user.getName(),
                 user.getUsername(),
                 user.getEmail(),
-                user.getUserImage(),
-                user.getLandscapeImage());
+                user.getUserImage().getName(),
+                user.getLandscapeImage().getName());
     }
 
     public CompleteUserDTO toCompleteUserDTO(User user) {

@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.UUID;
 
 public interface JoinGroupRequestRepository extends Neo4jRepository<JoinGroupRequest, UUID> {
+
     @Query("MATCH (user:User {id: $user}) " +
             "MATCH (joinRequest:JoinRequest)-[:REQUESTED_BY]->(user) " +
             "MATCH (joinRequest)-[:FOR_GROUP]->(group:Group {id: $group}) " +

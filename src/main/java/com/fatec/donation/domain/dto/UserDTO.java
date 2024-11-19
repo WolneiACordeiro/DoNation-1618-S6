@@ -13,6 +13,6 @@ public class UserDTO {
     private String name;
     private String username;
     private String email;
-    private UserImages profileImage;
-    private UserImages landscapeImage;
+    private String profileImage;
+    private String landscapeImage;
 }

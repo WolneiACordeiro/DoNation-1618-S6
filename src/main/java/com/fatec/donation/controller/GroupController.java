@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/groups")
@@ -219,6 +220,15 @@ public class GroupController {
     public ResponseEntity<Void> rejectJoinRequest(@PathVariable String userName, @PathVariable String groupName) {
         groupService.rejectJoinRequest(userName, groupName);
         return ResponseEntity.noContent().build();
+    }
+
+    @SecurityRequirement(name = "bearerAuth")
+    @GetMapping("/search")
+    public ResponseEntity<List<GroupDTO>> searchGroups(
+            @RequestParam(value = "term", required = false) String term
+    ) {
+        List<GroupDTO> groups = groupService.searchGroupsExcludingOwnerOrMember(term);
+        return ResponseEntity.ok(groups);
     }
 
 }

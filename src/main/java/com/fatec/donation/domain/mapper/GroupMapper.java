@@ -15,9 +15,11 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.text.Normalizer;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Component
 public class GroupMapper {
@@ -32,34 +34,48 @@ public class GroupMapper {
         groupDTO.setGroupname(group.getGroupname());
         groupDTO.setDescription(group.getDescription());
         groupDTO.setAddress(group.getAddress());
-
-        groupDTO.setGroupImage(group.getGroupImage());
-        groupDTO.setLandscapeImage(group.getLandscapeImage());
+//        groupDTO.setGroupImage(group.getGroupImage().getName());
+//        groupDTO.setLandscapeImage(group.getLandscapeImage().getName());
+        groupDTO.setGroupImage("group.getGroupImage().getName()");
+        groupDTO.setLandscapeImage("group.getLandscapeImage().getName()");
 
         User user = group.getOwner();
-        UserDTO userDTO = new UserDTO(
-                user.getName(),
-                user.getUsername(),
-                user.getEmail(),
-                user.getUserImage(),
-                user.getLandscapeImage()
-        );
-        groupDTO.setOwner(userDTO);
+        if (user != null) {
+            UserDTO userDTO = new UserDTO(
+                    user.getName(),
+                    user.getUsername(),
+                    user.getEmail(),
+//                    user.getUserImage().getName(),
+//                    user.getLandscapeImage().getName()
+                    user.getUserImage().getName(),
+                    user.getLandscapeImage().getName()
+            );
+            groupDTO.setOwner(userDTO);
+        } else {
+
+            groupDTO.setOwner(null);
+        }
         return groupDTO;
+    }
+
+    public List<GroupDTO> toGroupDTOList(List<Group> groups) {
+        return groups.stream()
+                .map(this::toGroupDTO)
+                .collect(Collectors.toList());
     }
 
     public Group toGroup(CreateGroupRequest request, User owner) throws IOException {
         return Group.builder()
-        .id(UUID.randomUUID())
-        .name(request.getName())
-        .groupname(createUniqueGroupName(request.getName()))
-        .description(request.getDescription())
-        .address(request.getAddress())
-        .createdAt(LocalDateTime.now())
-        .groupImage(request.getGroupImage())
-        .landscapeImage(request.getLandscapeImage())
-        .owner(owner)
-        .build();
+                .id(UUID.randomUUID())
+                .name(request.getName())
+                .groupname(createUniqueGroupName(request.getName()))
+                .description(request.getDescription())
+                .address(request.getAddress())
+                .createdAt(LocalDateTime.now())
+                .groupImage(request.getGroupImage())
+                .landscapeImage(request.getLandscapeImage())
+                .owner(owner)
+                .build();
     }
 
     public String createUniqueGroupName(String name) {
