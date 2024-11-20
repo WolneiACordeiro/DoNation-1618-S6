@@ -120,10 +120,10 @@ public class GroupImagesServiceImpl implements GroupImagesService {
         return groupImagesRepository.save(groupImage);
     }
 
-    public GroupImages updateOrCreateLandscapeForGroup(UUID userId, MultipartFile file) throws IOException {
+    public GroupImages updateOrCreateLandscapeForGroup(UUID groupId, MultipartFile file) throws IOException {
         GroupImages groupImage;
 
-        Optional<GroupImages> imageOptional = groupImagesRepository.findByGroupIdLandscape(userId);
+        Optional<GroupImages> imageOptional = groupImagesRepository.findByGroupIdLandscape(groupId);
         groupImage = imageOptional.orElseGet(GroupImages::new);
 
         if (file == null) {

@@ -1,11 +1,14 @@
 package com.fatec.donation.repository;
 
+import com.fatec.donation.domain.dto.GroupImagesDTO;
 import com.fatec.donation.domain.entity.Group;
+import com.fatec.donation.domain.images.GroupImages;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.neo4j.repository.query.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface GroupRepository extends Neo4jRepository<Group, UUID> {
@@ -39,5 +42,10 @@ public interface GroupRepository extends Neo4jRepository<Group, UUID> {
             "RETURN g")
     List<Group> findGroupsBySearchTermAndExcludingOwnerOrMember(@Param("searchTerm") String searchTerm, @Param("userId") UUID userId);
 
+    @Query("MATCH (g:Group {groupname: $groupname}) " +
+            "OPTIONAL MATCH (g)<-[r]-(i:GroupImages) " +
+            "WHERE type(r) = $relationType " +
+            "RETURN i.id AS id, i.name AS name, i.imageLink AS imageLink LIMIT 1")
+    Optional<GroupImagesDTO> findByGroupnameAndRelationTypeDTO(@Param("groupname") String groupname, @Param("relationType") String relationType);
 
 }

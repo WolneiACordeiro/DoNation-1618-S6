@@ -18,12 +18,5 @@ public interface GroupImagesRepository extends Neo4jRepository<GroupImages, UUID
     @Query("MATCH (u:Group {id: $groupId})<-[:LANDSCAPE_IMAGE]-(img:GroupImages) " +
             "RETURN img")
     Optional<GroupImages> findByGroupIdLandscape(UUID groupId);
-
-    @Query("MATCH (g:Group) " +
-            "OPTIONAL MATCH (g)<-[r:PROFILE_IMAGE|LANDSCAPE_IMAGE]-(i:GroupImages) " +
-            "WHERE g.id = $groupId AND type(r) = $type " +
-            "RETURN i LIMIT 1")
-    GroupImages findByGroupIdAndType(@Param("groupId") UUID groupId, @Param("type") String type);
-
 }
 

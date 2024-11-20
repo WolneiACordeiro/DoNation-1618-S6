@@ -1,12 +1,16 @@
 package com.fatec.donation.domain.mapper;
 
 import com.fatec.donation.domain.dto.GroupDTO;
+import com.fatec.donation.domain.dto.GroupImagesDTO;
 import com.fatec.donation.domain.dto.UserDTO;
 import com.fatec.donation.domain.entity.Group;
 import com.fatec.donation.domain.entity.User;
+import com.fatec.donation.domain.images.GroupImages;
 import com.fatec.donation.domain.request.CreateGroupRequest;
 import com.fatec.donation.domain.request.UpdateGroupRequest;
+import com.fatec.donation.repository.GroupImagesRepository;
 import com.fatec.donation.repository.GroupRepository;
+import com.fatec.donation.repository.UserRepository;
 import com.fatec.donation.services.GroupImagesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -16,6 +20,7 @@ import java.io.IOException;
 import java.text.Normalizer;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -27,6 +32,8 @@ public class GroupMapper {
     @Autowired
     GroupRepository groupRepository;
     GroupImagesService groupImagesService;
+    UserRepository userRepository;
+    UserMapper userMapper;
 
     public GroupDTO toGroupDTO(Group group) {
         GroupDTO groupDTO = new GroupDTO();
@@ -36,8 +43,15 @@ public class GroupMapper {
         groupDTO.setAddress(group.getAddress());
 //        groupDTO.setGroupImage(group.getGroupImage().getName());
 //        groupDTO.setLandscapeImage(group.getLandscapeImage().getName());
-        groupDTO.setGroupImage("group.getGroupImage().getName()");
-        groupDTO.setLandscapeImage("group.getLandscapeImage().getName()");
+//        groupDTO.setOwner(userMapper.toUserDTO(userRepository.findOwnerByGroupId(group.getId())));
+        System.out.println("AQUI:");
+        System.out.println(group.getId());
+        System.out.println(group.getGroupname());
+
+        Optional<GroupImagesDTO> profileImageOpt = groupRepository.findByGroupnameAndRelationTypeDTO(group.getGroupname(), "PROFILE_IMAGE");
+        profileImageOpt.map(GroupImagesDTO::getName).ifPresent(groupDTO::setGroupImage);
+        Optional<GroupImagesDTO> landscapeImageOpt = groupRepository.findByGroupnameAndRelationTypeDTO(group.getGroupname(), "LANDSCAPE_IMAGE");
+        landscapeImageOpt.map(GroupImagesDTO::getName).ifPresent(groupDTO::setLandscapeImage);
 
         User user = group.getOwner();
         if (user != null) {
@@ -45,8 +59,6 @@ public class GroupMapper {
                     user.getName(),
                     user.getUsername(),
                     user.getEmail(),
-//                    user.getUserImage().getName(),
-//                    user.getLandscapeImage().getName()
                     user.getUserImage().getName(),
                     user.getLandscapeImage().getName()
             );
