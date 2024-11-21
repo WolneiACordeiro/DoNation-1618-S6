@@ -3,6 +3,7 @@ package com.fatec.donation.domain.mapper;
 import com.fatec.donation.domain.dto.GroupDTO;
 import com.fatec.donation.domain.dto.GroupImagesDTO;
 import com.fatec.donation.domain.dto.UserDTO;
+import com.fatec.donation.domain.dto.UserOwnerDTO;
 import com.fatec.donation.domain.entity.Group;
 import com.fatec.donation.domain.entity.User;
 import com.fatec.donation.domain.images.GroupImages;
@@ -31,9 +32,8 @@ public class GroupMapper {
 
     @Autowired
     GroupRepository groupRepository;
-    GroupImagesService groupImagesService;
+    @Autowired
     UserRepository userRepository;
-    UserMapper userMapper;
 
     public GroupDTO toGroupDTO(Group group) {
         GroupDTO groupDTO = new GroupDTO();
@@ -41,32 +41,27 @@ public class GroupMapper {
         groupDTO.setGroupname(group.getGroupname());
         groupDTO.setDescription(group.getDescription());
         groupDTO.setAddress(group.getAddress());
-//        groupDTO.setGroupImage(group.getGroupImage().getName());
-//        groupDTO.setLandscapeImage(group.getLandscapeImage().getName());
-//        groupDTO.setOwner(userMapper.toUserDTO(userRepository.findOwnerByGroupId(group.getId())));
-        System.out.println("AQUI:");
-        System.out.println(group.getId());
-        System.out.println(group.getGroupname());
-
+        UUID groupId = group.getId();
+        UserOwnerDTO owner = userRepository.findOwnerDTOByGroupId(groupId);
+        System.out.println("OWNER:" + owner); // Verifique se retorna `null`
+        groupDTO.setOwner(owner);
         Optional<GroupImagesDTO> profileImageOpt = groupRepository.findByGroupnameAndRelationTypeDTO(group.getGroupname(), "PROFILE_IMAGE");
         profileImageOpt.map(GroupImagesDTO::getName).ifPresent(groupDTO::setGroupImage);
         Optional<GroupImagesDTO> landscapeImageOpt = groupRepository.findByGroupnameAndRelationTypeDTO(group.getGroupname(), "LANDSCAPE_IMAGE");
         landscapeImageOpt.map(GroupImagesDTO::getName).ifPresent(groupDTO::setLandscapeImage);
 
-        User user = group.getOwner();
-        if (user != null) {
-            UserDTO userDTO = new UserDTO(
-                    user.getName(),
-                    user.getUsername(),
-                    user.getEmail(),
-                    user.getUserImage().getName(),
-                    user.getLandscapeImage().getName()
-            );
-            groupDTO.setOwner(userDTO);
-        } else {
+//        User user = group.getOwner();
+//        if (user != null) {
+//            UserOwnerDTO userOwnerDTO = new UserOwnerDTO(
+//                    user.getName(),
+//                    user.getUsername(),
+//                    user.getEmail()
+//            );
+//            groupDTO.setOwner(userOwnerDTO);
+//        } else {
+//            groupDTO.setOwner(null);
+//        }
 
-            groupDTO.setOwner(null);
-        }
         return groupDTO;
     }
 

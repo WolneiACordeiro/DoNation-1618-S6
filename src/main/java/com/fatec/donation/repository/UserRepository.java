@@ -1,6 +1,7 @@
 package com.fatec.donation.repository;
 
 import com.fatec.donation.domain.dto.UserDTO;
+import com.fatec.donation.domain.dto.UserOwnerDTO;
 import com.fatec.donation.domain.entity.User;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.neo4j.repository.query.Query;
@@ -19,6 +20,9 @@ public interface UserRepository extends Neo4jRepository<User, UUID> {
 
     @Query("MATCH (g:Group)-[:OWNER]->(u:User) WHERE g.id = $groupId RETURN u")
     User findOwnerByGroupId(@Param("groupId") UUID groupId);
+
+    @Query("MATCH (g:Group {id: $groupId})-[:OWNER]->(u:User) RETURN u.name AS name, u.username AS username, u.email AS email;")
+    UserOwnerDTO findOwnerDTOByGroupId(@Param("groupId") UUID groupId);
 
     Optional<User> findUserByUsername(String username);
 

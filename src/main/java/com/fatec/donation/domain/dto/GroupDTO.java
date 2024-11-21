@@ -14,7 +14,7 @@ public class GroupDTO {
     private String groupname;
     private String description;
     private String address;
-    private UserDTO owner;
+    private UserOwnerDTO owner;
     private String groupImage;
     private String landscapeImage;
 }
