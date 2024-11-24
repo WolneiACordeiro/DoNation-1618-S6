@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface GroupService {
-    GroupDTO createGroup(CreateGroupRequest request) throws IOException;
+    GroupDTO createGroup(CreateGroupRequest request, MultipartFile imageFile, MultipartFile landscapeFile) throws IOException;
     GroupDTO updateGroup(String groupName, UpdateGroupRequest request, MultipartFile imageFile, MultipartFile landscapeFile) throws IOException;
     void deleteGroup(String groupName);
     void createJoinRequest(String groupName);

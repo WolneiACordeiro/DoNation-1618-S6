@@ -73,11 +73,19 @@ public class GroupController {
             }
     )
     @SecurityRequirement(name = "bearerAuth")
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<GroupDTO> createGroup(@RequestBody CreateGroupRequest request) throws IOException {
-        GroupDTO groupCreated = groupService.createGroup(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(groupCreated);
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<GroupDTO> createGroup(
+            @RequestPart(value = "createGroupRequest") @Valid CreateGroupRequest request,
+            @RequestPart(value = "imageFile", required = false) MultipartFile imageFile,
+            @RequestPart(value = "landscapeFile", required = false) MultipartFile landscapeFile) {
+        try {
+            GroupDTO groupCreated = groupService.createGroup(request, imageFile, landscapeFile);
+            return ResponseEntity.status(HttpStatus.CREATED).body(groupCreated);
+        } catch (IOException e) {
+            throw new RuntimeException("Error handling file upload", e);
+        }
     }
+
 
     @Operation(
             summary = "Update an existing group",

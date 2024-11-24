@@ -45,15 +45,42 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     @Transactional(transactionManager = "transactionManager")
-    public GroupDTO createGroup(CreateGroupRequest request) throws IOException {
+    public GroupDTO createGroup(CreateGroupRequest request, MultipartFile imageFile, MultipartFile landscapeFile) throws IOException {
+        // Obtendo o ID do usuário a partir do JWT
         UUID userId = userService.getUserIdByJwt();
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
-        request.setGroupImage(groupImagesService.updateOrCreateImageForGroup(null, null));
-        request.setLandscapeImage(groupImagesService.updateOrCreateLandscapeForGroup(null, null));
+
+
+//        String groupImage = null;
+//        String landscapeImage = null;
+
+        GroupImages groupImage = null;
+        GroupImages landscapeImage = null;
+
+        if (imageFile != null && !imageFile.isEmpty()) {
+
+            GroupImages savedProfileImage = groupImagesService.updateOrCreateImageForGroup(null, imageFile);
+//            groupImage = savedProfileImage.getName();
+            groupImage = savedProfileImage;
+        }
+
+        if (landscapeFile != null && !landscapeFile.isEmpty()) {
+
+            GroupImages savedLandscapeImage = groupImagesService.updateOrCreateLandscapeForGroup(null, landscapeFile);
+//            landscapeImage = savedLandscapeImage.getName();
+            landscapeImage = savedLandscapeImage;
+        }
+
+        request.setGroupImage(groupImage);
+        request.setLandscapeImage(landscapeImage);
+
         Group group = groupMapper.toGroup(request, user);
+
         Group savedGroup = groupRepository.save(group);
+
         evictAllGroupsCache();
+
         return groupMapper.toGroupDTO(savedGroup);
     }
 

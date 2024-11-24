@@ -15,6 +15,10 @@ spring:
   web:
     resources:
       add-mappings: true
+  logging:
+    level:
+      org.springframework.data.neo4j: DEBUG
+      org.neo4j: DEBUG
 
 server:
   base:
