@@ -17,5 +17,14 @@ public interface UserImagesRepository extends Neo4jRepository<UserImages, UUID> 
     @Query("MATCH (u:User {id: $userId})<-[:LANDSCAPE_IMAGE]-(img:UserImages) " +
             "RETURN img")
     Optional<UserImages> findByUserIdLandscape(UUID userId);
+
+    @Query("MATCH (u:User {email: $userEmail})<-[:PROFILE_IMAGE]-(img:UserImages) " +
+            "RETURN img.name")
+    Optional<String> findProfileImageNameByUserEmail(String userEmail);
+
+    @Query("MATCH (u:User {email: $userEmail})<-[:LANDSCAPE_IMAGE]-(img:UserImages) " +
+            "RETURN img.name")
+    Optional<String> findLandscapeImageNameByUserEmail(String userEmail);
+
 }
 

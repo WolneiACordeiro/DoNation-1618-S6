@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
@@ -26,4 +27,5 @@ public interface UserService {
     ResponseEntity<UserDTO> getUserProfile(UUID userId);
     User completeInfosUser(CompleteUserRequest request, UUID userId);
     void logout(String token);
+    List<UserDTO> findTop5UsersWithImages(UUID groupId);
 }

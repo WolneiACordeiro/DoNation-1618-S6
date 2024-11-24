@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -15,7 +17,9 @@ public class GroupDTO {
     private String description;
     private String address;
     private UserOwnerDTO owner;
+    private List<UserDTO> members;
     private String groupImage;
     private String landscapeImage;
+    private Long users;
 }
 

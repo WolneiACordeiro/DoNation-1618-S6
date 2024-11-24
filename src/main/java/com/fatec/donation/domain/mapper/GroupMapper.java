@@ -3,27 +3,21 @@ package com.fatec.donation.domain.mapper;
 import com.fatec.donation.domain.dto.GroupDTO;
 import com.fatec.donation.domain.dto.GroupImagesDTO;
 import com.fatec.donation.domain.dto.UserDTO;
-import com.fatec.donation.domain.dto.UserOwnerDTO;
 import com.fatec.donation.domain.entity.Group;
 import com.fatec.donation.domain.entity.User;
-import com.fatec.donation.domain.images.GroupImages;
 import com.fatec.donation.domain.request.CreateGroupRequest;
 import com.fatec.donation.domain.request.UpdateGroupRequest;
-import com.fatec.donation.repository.GroupImagesRepository;
 import com.fatec.donation.repository.GroupRepository;
 import com.fatec.donation.repository.UserRepository;
-import com.fatec.donation.services.GroupImagesService;
+import com.fatec.donation.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.neo4j.driver.types.Node;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.text.Normalizer;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -34,6 +28,9 @@ public class GroupMapper {
     GroupRepository groupRepository;
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    UserService userService;
+
 
     public GroupDTO toGroupDTO(Group group) {
         GroupDTO groupDTO = new GroupDTO();
@@ -41,27 +38,13 @@ public class GroupMapper {
         groupDTO.setGroupname(group.getGroupname());
         groupDTO.setDescription(group.getDescription());
         groupDTO.setAddress(group.getAddress());
-        UUID groupId = group.getId();
-        UserOwnerDTO owner = userRepository.findOwnerDTOByGroupId(groupId);
-        System.out.println("OWNER:" + owner); // Verifique se retorna `null`
-        groupDTO.setOwner(owner);
+        groupDTO.setOwner(userRepository.findOwnerDTOByGroupId(group.getId()));
+        groupDTO.setMembers(userService.findTop5UsersWithImages(group.getId()));
         Optional<GroupImagesDTO> profileImageOpt = groupRepository.findByGroupnameAndRelationTypeDTO(group.getGroupname(), "PROFILE_IMAGE");
         profileImageOpt.map(GroupImagesDTO::getName).ifPresent(groupDTO::setGroupImage);
         Optional<GroupImagesDTO> landscapeImageOpt = groupRepository.findByGroupnameAndRelationTypeDTO(group.getGroupname(), "LANDSCAPE_IMAGE");
         landscapeImageOpt.map(GroupImagesDTO::getName).ifPresent(groupDTO::setLandscapeImage);
-
-//        User user = group.getOwner();
-//        if (user != null) {
-//            UserOwnerDTO userOwnerDTO = new UserOwnerDTO(
-//                    user.getName(),
-//                    user.getUsername(),
-//                    user.getEmail()
-//            );
-//            groupDTO.setOwner(userOwnerDTO);
-//        } else {
-//            groupDTO.setOwner(null);
-//        }
-
+        groupDTO.setUsers(userRepository.countUsersByGroupId(group.getId()));
         return groupDTO;
     }
 

@@ -16,6 +16,8 @@ import com.fatec.donation.exceptions.EntityNotFoundException;
 import com.fatec.donation.exceptions.IllegalArgumentException;
 import com.fatec.donation.exceptions.ResourceNotFoundException;
 import com.fatec.donation.jwt.JwtService;
+import com.fatec.donation.repository.GroupRepository;
+import com.fatec.donation.repository.UserImagesRepository;
 import com.fatec.donation.repository.UserRepository;
 import com.fatec.donation.services.UserImagesService;
 import com.fatec.donation.services.UserService;
@@ -50,6 +52,7 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final PlatformTransactionManager transactionManager;
     private  final UserImagesService userImagesService;
+    private final UserImagesRepository userImagesRepository;
 
     @Override
     @Cacheable(value = "usersByEmail", key = "#email")
@@ -183,6 +186,43 @@ public class UserServiceImpl implements UserService {
     public User getUserById(UUID userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com o ID: " + userId));
+    }
+
+    public List<UserDTO> findTop5UsersWithImages(UUID groupId) {
+        // Busca os usuários vinculados ao grupo
+        List<UserDTO> users = userRepository.findTop5UsersByGroupId(groupId);
+
+        // Itera pelos usuários para preencher as imagens ausentes
+        for (UserDTO user : users) {
+            // Verifica e obtém a imagem de perfil se estiver ausente
+            if (isNullOrEmpty(user.getUserImage())) {
+                user.setUserImage(fetchUserProfileImage(user.getEmail()));
+                System.out.println("Profile Image for " + user.getEmail() + ": " + user.getUserImage());
+            }
+
+            // Verifica e obtém a imagem de paisagem se estiver ausente
+            if (isNullOrEmpty(user.getLandscapeImage())) {
+                user.setLandscapeImage(fetchUserLandscapeImage(user.getEmail()));
+                System.out.println("Landscape Image for " + user.getEmail() + ": " + user.getLandscapeImage());
+            }
+        }
+
+        return users;
+    }
+
+    private String fetchUserProfileImage(String email) {
+        // Busca diretamente a string do nome da imagem
+        return userImagesRepository.findProfileImageNameByUserEmail(email).orElse(null);
+    }
+
+    private String fetchUserLandscapeImage(String email) {
+        // Busca diretamente a string do nome da imagem
+        return userImagesRepository.findLandscapeImageNameByUserEmail(email).orElse(null);
+    }
+
+    // Método utilitário para verificar strings nulas ou vazias
+    private boolean isNullOrEmpty(String str) {
+        return str == null || str.trim().isEmpty();
     }
 
     // Métodos auxiliares
