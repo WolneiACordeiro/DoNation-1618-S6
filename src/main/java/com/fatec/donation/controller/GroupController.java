@@ -239,4 +239,22 @@ public class GroupController {
         return ResponseEntity.ok(groups);
     }
 
+    @SecurityRequirement(name = "bearerAuth")
+    @GetMapping("/search/member")
+    public ResponseEntity<List<GroupDTO>> searchGroupsMember(
+            @RequestParam(value = "term", required = false) String term
+    ) {
+        List<GroupDTO> groups = groupService.searchGroupsOnlyMember(term);
+        return ResponseEntity.ok(groups);
+    }
+
+    @SecurityRequirement(name = "bearerAuth")
+    @GetMapping("/search/owner")
+    public ResponseEntity<List<GroupDTO>> searchGroupsOwner(
+            @RequestParam(value = "term", required = false) String term
+    ) {
+        List<GroupDTO> groups = groupService.searchGroupsOnlyOwner(term);
+        return ResponseEntity.ok(groups);
+    }
+
 }

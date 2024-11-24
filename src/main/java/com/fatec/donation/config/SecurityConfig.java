@@ -70,6 +70,8 @@ public class SecurityConfig {
                     auth.requestMatchers(HttpMethod.DELETE, "/api/v1/groups/{groupName}").hasAnyRole("ADMIN", "USER");
                     auth.requestMatchers(HttpMethod.GET, "/api/v1/groups/authorities").authenticated();
                     auth.requestMatchers(HttpMethod.GET, "/api/v1/groups/search").authenticated();
+                    auth.requestMatchers(HttpMethod.GET, "/api/v1/groups/search/member").authenticated();
+                    auth.requestMatchers(HttpMethod.GET, "/api/v1/groups/search/owner").authenticated();
                     auth.requestMatchers(HttpMethod.POST, "/api/v1/groups/join/{groupName}").hasAnyRole("ADMIN", "USER");
                     auth.requestMatchers(HttpMethod.PUT, "/api/v1/groups/block/{groupName}/{userId}").hasAnyRole("ADMIN", "USER");
                     auth.requestMatchers(HttpMethod.PUT, "/api/v1/groups/unblock/{groupName}/{userId}").hasAnyRole("ADMIN", "USER");

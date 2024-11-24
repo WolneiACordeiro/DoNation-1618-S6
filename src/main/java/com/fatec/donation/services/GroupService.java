@@ -22,5 +22,7 @@ public interface GroupService {
     void blockJoinRequest(String groupName, String userName);
     void unblockJoinRequest(String groupName, String userName);
     List<GroupDTO> searchGroupsExcludingOwnerOrMember(String searchTerm);
+    List<GroupDTO> searchGroupsOnlyMember(String searchTerm);
+    List<GroupDTO> searchGroupsOnlyOwner(String searchTerm);
     Page<GroupDTO> getAllGroups(Pageable pageable);
 }

@@ -57,12 +57,4 @@ public interface UserRepository extends Neo4jRepository<User, UUID> {
     """)
     List<UserDTO> findTop5UsersByGroupId(@Param("groupId") UUID groupId);
 
-    @Query("""
-    MATCH (g:Group {id: $groupId})
-    OPTIONAL MATCH (u:User)<-[:MEMBER]-(g)
-    OPTIONAL MATCH (g)-[:OWNER]->(o:User)
-    RETURN COUNT(u) + COUNT(o) AS userCount
-    """)
-    Long countUsersByGroupId(@Param("groupId") UUID groupId);
-
 }

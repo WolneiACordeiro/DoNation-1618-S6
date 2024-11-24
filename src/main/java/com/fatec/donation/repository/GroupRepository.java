@@ -42,6 +42,24 @@ public interface GroupRepository extends Neo4jRepository<Group, UUID> {
             "RETURN g")
     List<Group> findGroupsBySearchTermAndExcludingOwnerOrMember(@Param("searchTerm") String searchTerm, @Param("userId") UUID userId);
 
+    @Query("MATCH (g:Group) " +
+            "WHERE (coalesce($searchTerm, '') = '' OR g.address CONTAINS $searchTerm OR g.groupname CONTAINS $searchTerm OR g.name CONTAINS $searchTerm) " +
+            "AND EXISTS { " +
+            "  MATCH (u:User {id: $userId}) " +
+            "  WHERE (u)<-[:OWNER]-(g) " +
+            "} " +
+            "RETURN g")
+    List<Group> findGroupsBySearchTermAndOnlyOwner(@Param("searchTerm") String searchTerm, @Param("userId") UUID userId);
+
+    @Query("MATCH (g:Group) " +
+            "WHERE (coalesce($searchTerm, '') = '' OR g.address CONTAINS $searchTerm OR g.groupname CONTAINS $searchTerm OR g.name CONTAINS $searchTerm) " +
+            "AND EXISTS { " +
+            "  MATCH (u:User {id: $userId}) " +
+            "  WHERE (u)-[:MEMBER]->(g) " +
+            "} " +
+            "RETURN g")
+    List<Group> findGroupsBySearchTermAndOnlyMember(@Param("searchTerm") String searchTerm, @Param("userId") UUID userId);
+
     @Query("MATCH (g:Group {groupname: $groupname}) " +
             "OPTIONAL MATCH (g)<-[r]-(i:GroupImages) " +
             "WHERE type(r) = $relationType " +

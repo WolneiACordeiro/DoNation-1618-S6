@@ -44,7 +44,7 @@ public class GroupMapper {
         profileImageOpt.map(GroupImagesDTO::getName).ifPresent(groupDTO::setGroupImage);
         Optional<GroupImagesDTO> landscapeImageOpt = groupRepository.findByGroupnameAndRelationTypeDTO(group.getGroupname(), "LANDSCAPE_IMAGE");
         landscapeImageOpt.map(GroupImagesDTO::getName).ifPresent(groupDTO::setLandscapeImage);
-        groupDTO.setUsers(userRepository.countUsersByGroupId(group.getId()));
+        groupDTO.setUsers((long) groupDTO.getMembers().size());
         return groupDTO;
     }
 
