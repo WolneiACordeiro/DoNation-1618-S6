@@ -1,5 +1,6 @@
 package com.fatec.donation.services;
 
+import com.fatec.donation.domain.dto.JoinRequestDTO;
 import com.fatec.donation.domain.dto.UserDTO;
 import com.fatec.donation.domain.entity.AccessToken;
 import com.fatec.donation.domain.entity.User;

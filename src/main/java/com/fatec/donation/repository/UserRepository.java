@@ -2,6 +2,7 @@ package com.fatec.donation.repository;
 
 import com.fatec.donation.domain.dto.UserDTO;
 import com.fatec.donation.domain.dto.UserOwnerDTO;
+import com.fatec.donation.domain.entity.Group;
 import com.fatec.donation.domain.entity.User;
 import com.fatec.donation.domain.images.GroupImages;
 import com.fatec.donation.domain.images.UserImages;
@@ -56,5 +57,10 @@ public interface UserRepository extends Neo4jRepository<User, UUID> {
     LIMIT 5
     """)
     List<UserDTO> findTop5UsersByGroupId(@Param("groupId") UUID groupId);
+
+    User findByUsername(@Param("username") String username);
+
+    @Query("MATCH (user:User)<-[:REQUESTED_BY]-(joinRequest:JoinRequest {id: $joinRequestId}) RETURN user")
+    User findUserByJoinRequestId(UUID joinRequestId);
 
 }

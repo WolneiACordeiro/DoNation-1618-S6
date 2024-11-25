@@ -17,8 +17,9 @@ spring:
       add-mappings: true
   logging:
     level:
-      org.springframework.data.neo4j: DEBUG
-      org.neo4j: DEBUG
+      org.springframework.data.neo4j: WARN
+      org.neo4j: WARN
+      org.neo4j.driver: WARN
 
 server:
   base:

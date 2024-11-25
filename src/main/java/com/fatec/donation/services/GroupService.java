@@ -1,6 +1,7 @@
 package com.fatec.donation.services;
 
 import com.fatec.donation.domain.dto.GroupDTO;
+import com.fatec.donation.domain.dto.JoinRequestDTO;
 import com.fatec.donation.domain.entity.Group;
 import com.fatec.donation.domain.request.CreateGroupRequest;
 import com.fatec.donation.domain.request.UpdateGroupRequest;
@@ -25,4 +26,5 @@ public interface GroupService {
     List<GroupDTO> searchGroupsOnlyMember(String searchTerm);
     List<GroupDTO> searchGroupsOnlyOwner(String searchTerm);
     Page<GroupDTO> getAllGroups(Pageable pageable);
+    List<JoinRequestDTO> searchGroupJoinRequests(String groupName);
 }

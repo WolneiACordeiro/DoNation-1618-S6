@@ -66,4 +66,9 @@ public interface GroupRepository extends Neo4jRepository<Group, UUID> {
             "RETURN i.id AS id, i.name AS name, i.imageLink AS imageLink LIMIT 1")
     Optional<GroupImagesDTO> findByGroupnameAndRelationTypeDTO(@Param("groupname") String groupname, @Param("relationType") String relationType);
 
+    Group findByGroupname(@Param("groupname") String groupname);
+
+    @Query("MATCH (joinRequest:JoinRequest)-[:FOR_GROUP]->(group:Group) WHERE joinRequest.id = $joinRequestId RETURN group")
+    Group findGroupByJoinRequestId(UUID joinRequestId);
+
 }

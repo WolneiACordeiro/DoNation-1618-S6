@@ -1,6 +1,7 @@
 package com.fatec.donation.controller;
 
 import com.fatec.donation.domain.dto.GroupDTO;
+import com.fatec.donation.domain.dto.JoinRequestDTO;
 import com.fatec.donation.domain.request.CreateGroupRequest;
 import com.fatec.donation.domain.request.UpdateGroupRequest;
 import com.fatec.donation.domain.request.UpdateUserRequest;
@@ -255,6 +256,15 @@ public class GroupController {
     ) {
         List<GroupDTO> groups = groupService.searchGroupsOnlyOwner(term);
         return ResponseEntity.ok(groups);
+    }
+
+    @SecurityRequirement(name = "bearerAuth")
+    @GetMapping("/search/joinRequests/{groupName}")
+    public ResponseEntity<List<JoinRequestDTO>> searchGroupsJoinRequests(
+            @PathVariable(required = true) String groupName
+    ) {
+        List<JoinRequestDTO> joins = groupService.searchGroupJoinRequests(groupName);
+        return ResponseEntity.ok(joins);
     }
 
 }

@@ -1,10 +1,12 @@
 package com.fatec.donation.services.impl;
 
 import com.fatec.donation.domain.dto.GroupDTO;
+import com.fatec.donation.domain.dto.JoinRequestDTO;
 import com.fatec.donation.domain.entity.Group;
 import com.fatec.donation.domain.entity.User;
 import com.fatec.donation.domain.images.GroupImages;
 import com.fatec.donation.domain.mapper.GroupMapper;
+import com.fatec.donation.domain.mapper.JoinRequestMapper;
 import com.fatec.donation.domain.request.CreateGroupRequest;
 import com.fatec.donation.domain.request.JoinGroupRequest;
 import com.fatec.donation.domain.request.UpdateGroupRequest;
@@ -30,7 +32,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -42,6 +46,7 @@ public class GroupServiceImpl implements GroupService {
     private final GroupRepository groupRepository;
     private final JoinGroupRequestRepository joinGroupRequestRepository;
     private final PlatformTransactionManager transactionManager;
+    private final JoinRequestMapper joinRequestMapper;
 
     @Override
     @Transactional(transactionManager = "transactionManager")
@@ -172,6 +177,25 @@ public class GroupServiceImpl implements GroupService {
         UUID userId = userService.getUserIdByJwt();
         List<Group> groups = groupRepository.findGroupsBySearchTermAndOnlyOwner(searchTerm, userId);
         return groupMapper.toGroupDTOList(groups);
+    }
+
+    @Override
+    @Transactional(transactionManager = "transactionManager")
+    public List<JoinRequestDTO> searchGroupJoinRequests(String groupName) {
+        UUID userId = userService.getUserIdByJwt();
+        UUID groupId = groupRepository.findIdByGroupname(groupName);
+
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new EntityNotFoundException("Grupo não encontrado"));
+
+        if (!joinGroupRequestRepository.ownerByUserIdAndGroupId(userId, groupId)) {
+            throw new IllegalStateException("Você não é proprietário desse grupo");
+        }
+        List<JoinRequestDTO> requestDetails = joinRequestMapper.toJoinRequestDTO(groupId);
+        System.out.println(requestDetails);
+
+        return requestDetails;
+
     }
 
     @Override

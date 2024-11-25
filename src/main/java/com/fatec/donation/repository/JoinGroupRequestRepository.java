@@ -1,10 +1,12 @@
 package com.fatec.donation.repository;
 
+import com.fatec.donation.domain.dto.JoinRequestDTO;
 import com.fatec.donation.domain.request.JoinGroupRequest;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.neo4j.repository.query.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface JoinGroupRequestRepository extends Neo4jRepository<JoinGroupRequest, UUID> {
@@ -37,5 +39,9 @@ public interface JoinGroupRequestRepository extends Neo4jRepository<JoinGroupReq
     @Query("MATCH (:JoinRequest {id: $joinRequest})-[:REQUESTED_BY]->(user:User) " +
             "RETURN user.id AS userId")
     UUID findUserIdByJoinRequestId(UUID joinRequest);
+
+    @Query("MATCH (joinRequest:JoinRequest)-[:FOR_GROUP]->(group:Group {id: $groupId}) " +
+            "RETURN joinRequest.id AS id, joinRequest.createdAt AS createdAt")
+    List<JoinRequestDTO> findJoinRequestDTOByGroupId(UUID groupId);
 
 }
