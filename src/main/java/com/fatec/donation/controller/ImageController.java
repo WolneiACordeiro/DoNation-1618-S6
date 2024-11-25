@@ -27,8 +27,28 @@ public class ImageController {
     private final UserImagesService userImagesService;
 
     @GetMapping("/users/{filename}")
-    public ResponseEntity<Resource> getImage(@PathVariable String filename) throws IOException {
+    public ResponseEntity<Resource> getImageUser(@PathVariable String filename) throws IOException {
         File file = new File("src/main/resources/static/images/users/" + filename);
+
+        if (!file.exists()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Resource resource = new FileSystemResource(file);
+
+        String contentType = Files.probeContentType(file.toPath());
+        if (contentType == null) {
+            contentType = "image/jpeg";
+        }
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_TYPE, contentType)
+                .body(resource);
+    }
+
+    @GetMapping("/groups/{filename}")
+    public ResponseEntity<Resource> getImageGroup(@PathVariable String filename) throws IOException {
+        File file = new File("src/main/resources/static/images/groups/" + filename);
 
         if (!file.exists()) {
             return ResponseEntity.notFound().build();
