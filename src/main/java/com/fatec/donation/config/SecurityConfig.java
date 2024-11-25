@@ -62,8 +62,8 @@ public class SecurityConfig {
                     auth.requestMatchers(HttpMethod.GET, "/api/v1/user/check-access").authenticated();
                     auth.requestMatchers(HttpMethod.PUT, "/api/v1/user/complete-register").authenticated();
 
-                    auth.requestMatchers(HttpMethod.GET, "/api/v1/images/users/{filename}").authenticated();
-                    auth.requestMatchers(HttpMethod.GET, "/api/v1/images/groups/{filename}").authenticated();
+                    auth.requestMatchers(HttpMethod.GET, "/api/v1/images/users/{filename}").hasAnyRole("ADMIN", "USER");
+                    auth.requestMatchers(HttpMethod.GET, "/api/v1/images/groups/{filename}").hasAnyRole("ADMIN", "USER");
                     auth.requestMatchers(HttpMethod.GET, "/api/v1/images/users/images").hasAnyRole("ADMIN", "USER");
 
                     auth.requestMatchers(HttpMethod.POST, "/api/v1/groups").hasAnyRole("ADMIN", "USER");
