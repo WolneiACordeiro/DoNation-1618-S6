@@ -44,4 +44,8 @@ public interface JoinGroupRequestRepository extends Neo4jRepository<JoinGroupReq
             "RETURN joinRequest.id AS id, joinRequest.createdAt AS createdAt")
     List<JoinRequestDTO> findJoinRequestDTOByGroupId(UUID groupId);
 
+    @Query("MATCH (joinRequest:JoinRequest)-[:REQUESTED_BY]->(user:User {id: $userId}) " +
+            "RETURN joinRequest.id AS id, joinRequest.createdAt AS createdAt")
+    List<JoinRequestDTO> findJoinRequestDTOByUserId(@Param("userId") UUID userId);
+
 }

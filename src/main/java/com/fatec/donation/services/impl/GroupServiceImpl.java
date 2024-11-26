@@ -192,7 +192,16 @@ public class GroupServiceImpl implements GroupService {
             throw new IllegalStateException("Você não é proprietário desse grupo");
         }
         List<JoinRequestDTO> requestDetails = joinRequestMapper.toJoinRequestDTO(groupId);
-        System.out.println(requestDetails);
+
+        return requestDetails;
+
+    }
+
+    @Override
+    @Transactional(transactionManager = "transactionManager")
+    public List<JoinRequestDTO> searchUserJoinRequests() {
+        UUID userId = userService.getUserIdByJwt();
+        List<JoinRequestDTO> requestDetails = joinRequestMapper.toJoinRequestDTOByUser(userId);
 
         return requestDetails;
 

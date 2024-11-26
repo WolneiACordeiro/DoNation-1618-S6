@@ -267,4 +267,11 @@ public class GroupController {
         return ResponseEntity.ok(joins);
     }
 
+    @SecurityRequirement(name = "bearerAuth")
+    @GetMapping("/search/joinRequests/user")
+    public ResponseEntity<List<JoinRequestDTO>> searchGroupsJoinRequestsByMe() {
+        List<JoinRequestDTO> joins = groupService.searchUserJoinRequests();
+        return ResponseEntity.ok(joins);
+    }
+
 }

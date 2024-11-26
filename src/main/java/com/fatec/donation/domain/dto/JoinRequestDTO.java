@@ -7,15 +7,15 @@ import java.util.UUID;
 @Data
 public class JoinRequestDTO {
     private UUID id;
-    private GroupDTO group;
-    private UserDTO userDTO;
+    private GroupSimpleDTO group;
+    private UserSimpleDTO user;
 
     public JoinRequestDTO() {
     }
 
-    public JoinRequestDTO(UUID id, GroupDTO group, UserDTO userDTO) {
+    public JoinRequestDTO(UUID id, GroupSimpleDTO group, UserSimpleDTO user) {
         this.id = id;
         this.group = group;
-        this.userDTO = userDTO;
+        this.user = user;
     }
 }
