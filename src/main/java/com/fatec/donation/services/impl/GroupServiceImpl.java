@@ -1,6 +1,7 @@
 package com.fatec.donation.services.impl;
 
 import com.fatec.donation.domain.dto.GroupDTO;
+import com.fatec.donation.domain.dto.GroupWithJoinDTO;
 import com.fatec.donation.domain.dto.JoinRequestDTO;
 import com.fatec.donation.domain.entity.Group;
 import com.fatec.donation.domain.entity.User;
@@ -157,10 +158,11 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     @Transactional(transactionManager = "transactionManager")
-    public List<GroupDTO> searchGroupsExcludingOwnerOrMember(String searchTerm) {
+    public List<GroupWithJoinDTO> searchGroupsExcludingOwnerOrMember(String searchTerm) {
         UUID userId = userService.getUserIdByJwt();
-        List<Group> groups = groupRepository.findGroupsBySearchTermAndExcludingOwnerOrMember(searchTerm, userId);
-        return groupMapper.toGroupDTOList(groups);
+        List<Group> groups = groupRepository.findGroupsBySearchTermAndOnlyMember(searchTerm, userId);
+        List<GroupDTO> groupsDTO = groupMapper.toGroupDTOList(groups);
+        return groupMapper.toGroupWithJoinDTOList(groupsDTO, userId);
     }
 
     @Override

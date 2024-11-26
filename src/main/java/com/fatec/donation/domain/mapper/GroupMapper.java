@@ -2,12 +2,14 @@ package com.fatec.donation.domain.mapper;
 
 import com.fatec.donation.domain.dto.GroupDTO;
 import com.fatec.donation.domain.dto.GroupImagesDTO;
+import com.fatec.donation.domain.dto.GroupWithJoinDTO;
 import com.fatec.donation.domain.dto.UserDTO;
 import com.fatec.donation.domain.entity.Group;
 import com.fatec.donation.domain.entity.User;
 import com.fatec.donation.domain.request.CreateGroupRequest;
 import com.fatec.donation.domain.request.UpdateGroupRequest;
 import com.fatec.donation.repository.GroupRepository;
+import com.fatec.donation.repository.JoinGroupRequestRepository;
 import com.fatec.donation.repository.UserRepository;
 import com.fatec.donation.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +33,9 @@ public class GroupMapper {
     @Autowired
     UserService userService;
 
+    @Autowired
+    JoinGroupRequestRepository joinGroupRequestRepository;
+
 
     public GroupDTO toGroupDTO(Group group) {
         GroupDTO groupDTO = new GroupDTO();
@@ -46,6 +51,31 @@ public class GroupMapper {
         landscapeImageOpt.map(GroupImagesDTO::getName).ifPresent(groupDTO::setLandscapeImage);
         groupDTO.setUsers(groupRepository.findTotalUsersInGroupIncludingOwner(group.getId()));
         return groupDTO;
+    }
+
+    public GroupWithJoinDTO toGroupWithJoinDTO(GroupDTO groupDTO, UUID userId){
+        GroupWithJoinDTO groupWithJoinDTO = new GroupWithJoinDTO();
+        groupWithJoinDTO.setName(groupDTO.getName());
+        groupWithJoinDTO.setGroupname(groupDTO.getGroupname());
+        groupWithJoinDTO.setDescription(groupDTO.getDescription());
+        groupWithJoinDTO.setAddress(groupDTO.getAddress());
+        groupWithJoinDTO.setOwner(groupDTO.getOwner());
+        groupWithJoinDTO.setMembers(groupDTO.getMembers());
+        groupWithJoinDTO.setGroupImage(groupDTO.getGroupImage());
+        groupWithJoinDTO.setLandscapeImage(groupDTO.getLandscapeImage());
+        groupWithJoinDTO.setUsers(groupDTO.getUsers());
+
+        UUID groupId = groupRepository.findIdByGroupname(groupDTO.getGroupname());
+
+        groupWithJoinDTO.setRequest(joinGroupRequestRepository.existsByUserIdAndGroupId(userId, groupId));
+
+        return groupWithJoinDTO;
+    }
+
+    public List<GroupWithJoinDTO> toGroupWithJoinDTOList(List<GroupDTO> groups, UUID userId) {
+        return groups.stream()
+                .map(groupDTO -> toGroupWithJoinDTO(groupDTO, userId))
+                .collect(Collectors.toList());
     }
 
     public List<GroupDTO> toGroupDTOList(List<Group> groups) {
