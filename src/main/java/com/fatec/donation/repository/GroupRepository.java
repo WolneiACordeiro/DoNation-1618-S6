@@ -71,4 +71,10 @@ public interface GroupRepository extends Neo4jRepository<Group, UUID> {
     @Query("MATCH (joinRequest:JoinRequest)-[:FOR_GROUP]->(group:Group) WHERE joinRequest.id = $joinRequestId RETURN group")
     Group findGroupByJoinRequestId(UUID joinRequestId);
 
+    @Query("MATCH (group:Group {id: $groupId}) " +
+            "OPTIONAL MATCH (group)<-[:MEMBER]-(members:User) " +
+            "OPTIONAL MATCH (group)-[:OWNER]->(owner:User) " +
+            "RETURN count(DISTINCT members) + count(DISTINCT owner) AS totalUsers")
+    Long findTotalUsersInGroupIncludingOwner(@Param("groupId") UUID groupId);
+
 }

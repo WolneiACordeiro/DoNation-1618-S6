@@ -197,13 +197,11 @@ public class UserServiceImpl implements UserService {
             // Verifica e obtém a imagem de perfil se estiver ausente
             if (isNullOrEmpty(user.getUserImage())) {
                 user.setUserImage(fetchUserProfileImage(user.getEmail()));
-                System.out.println("Profile Image for " + user.getEmail() + ": " + user.getUserImage());
             }
 
             // Verifica e obtém a imagem de paisagem se estiver ausente
             if (isNullOrEmpty(user.getLandscapeImage())) {
                 user.setLandscapeImage(fetchUserLandscapeImage(user.getEmail()));
-                System.out.println("Landscape Image for " + user.getEmail() + ": " + user.getLandscapeImage());
             }
         }
 
