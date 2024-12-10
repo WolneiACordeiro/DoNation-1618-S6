@@ -29,5 +29,4 @@ public interface UserService {
     User completeInfosUser(CompleteUserRequest request, UUID userId);
     void logout(String token);
     List<UserDTO> findTop5UsersWithImages(UUID groupId);
-    UserDTO getUserByUsername(String username);
 }

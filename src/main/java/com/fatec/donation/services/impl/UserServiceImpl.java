@@ -69,14 +69,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Cacheable(value = "usersOptionalByUsername", key = "#opt_username")
-    public UserDTO getUserByUsername(String username) {
-        userRepository.findOptionalUserByUsername(username)
-                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado."));
-        return userMapper.toUserDTO(userRepository.findUserByUsername(username));
-    }
-
-    @Override
     @Transactional(readOnly = true, transactionManager = "transactionManager")
     public AccessToken authenticate(String email, String password) {
         User user = getByEmail(email);

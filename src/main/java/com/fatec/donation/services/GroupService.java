@@ -29,5 +29,4 @@ public interface GroupService {
     Page<GroupDTO> getAllGroups(Pageable pageable);
     List<JoinRequestDTO> searchGroupJoinRequests(String groupName);
     List<JoinRequestDTO> searchUserJoinRequests();
-    GroupDTO getGroup(String groupname);
 }

@@ -119,15 +119,6 @@ public class GroupController {
         }
     }
 
-    @SecurityRequirement(name = "bearerAuth")
-    @GetMapping(value = "/profile/{groupName}")
-    public ResponseEntity<GroupDTO> getGroup(
-            @PathVariable String groupName
-    ) {
-        GroupDTO group = groupService.getGroup(groupName);
-        return new ResponseEntity<>(group, HttpStatus.OK);
-    }
-
     @Operation(
             summary = "Delete an existing group",
             description = "Delete an existing group by its name",
