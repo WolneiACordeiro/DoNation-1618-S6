@@ -43,6 +43,7 @@ public class GroupMapper {
         groupDTO.setGroupname(group.getGroupname());
         groupDTO.setDescription(group.getDescription());
         groupDTO.setAddress(group.getAddress());
+        groupDTO.setTags(group.getTags());
         groupDTO.setOwner(userRepository.findOwnerDTOByGroupId(group.getId()));
         groupDTO.setMembers(userService.findTop5UsersWithImages(group.getId()));
         Optional<GroupImagesDTO> profileImageOpt = groupRepository.findByGroupnameAndRelationTypeDTO(group.getGroupname(), "PROFILE_IMAGE");
@@ -91,6 +92,7 @@ public class GroupMapper {
                 .groupname(createUniqueGroupName(request.getName()))
                 .description(request.getDescription())
                 .address(request.getAddress())
+                .tags(request.getTags())
                 .createdAt(LocalDateTime.now())
                 .groupImage(request.getGroupImage())
                 .landscapeImage(request.getLandscapeImage())
