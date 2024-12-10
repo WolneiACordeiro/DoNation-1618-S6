@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @AllArgsConstructor
 @Getter
@@ -19,6 +20,8 @@ public class CreateGroupRequest {
     @NotBlank(message = "Endereço é obrigatório")
     @Size(max = 200, message = "Endereço deve ter no máximo 200 caracteres")
     private String address;
+    @Size(min = 1, message = "Pelo menos uma tag é obrigatória")
+    private List<@NotBlank(message = "A tag não pode estar em branco") String> tags;
     private LocalDateTime createdAt;
     private GroupImages groupImage;
     private GroupImages landscapeImage;

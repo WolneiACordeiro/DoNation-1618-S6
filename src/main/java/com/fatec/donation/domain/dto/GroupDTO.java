@@ -16,6 +16,7 @@ public class GroupDTO {
     private String groupname;
     private String description;
     private String address;
+    private List<String> tags;
     private UserOwnerDTO owner;
     private List<UserDTO> members;
     private String groupImage;

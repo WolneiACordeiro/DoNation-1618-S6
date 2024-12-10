@@ -11,6 +11,7 @@ import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Relationship;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -26,6 +27,7 @@ public class Group {
     private String groupname;
     private String description;
     private String address;
+    private List<String> tags;
     private LocalDateTime createdAt;
     @Relationship(type = "OWNER", direction = Relationship.Direction.OUTGOING)
     private User owner;
