@@ -169,7 +169,7 @@ public class GroupServiceImpl implements GroupService {
     @Transactional(transactionManager = "transactionManager")
     public List<GroupDTO> searchGroupsOnlyMember(String searchTerm) {
         UUID userId = userService.getUserIdByJwt();
-        List<Group> groups = groupRepository.findGroupsBySearchTermAndOnlyMember(searchTerm, userId);
+        List<Group> groups = groupRepository.findGroupsBySearchTermAndExcludingOwnerOrMember(searchTerm, userId);
         return groupMapper.toGroupDTOList(groups);
     }
 
