@@ -158,6 +158,13 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     @Transactional(transactionManager = "transactionManager")
+    public GroupDTO getGroup(String groupname) {
+        Group group = groupRepository.findByGroupname(groupname);
+        return groupMapper.toGroupDTO(group);
+    }
+
+    @Override
+    @Transactional(transactionManager = "transactionManager")
     public List<GroupWithJoinDTO> searchGroupsExcludingOwnerOrMember(String searchTerm) {
         UUID userId = userService.getUserIdByJwt();
         List<Group> groups = groupRepository.findGroupsBySearchTermAndOnlyMember(searchTerm, userId);
