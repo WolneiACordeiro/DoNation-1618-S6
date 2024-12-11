@@ -319,4 +319,18 @@ public class GroupServiceImpl implements GroupService {
         joinGroupRequestRepository.delete(joinRequest);
     }
 
+    @Override
+    @Transactional(transactionManager = "transactionManager")
+    public void deleteJoinRequest(String userName, String groupName) {
+        UUID requestId = joinGroupRequestRepository.findJoinRequestIdByUserNameAndGroupName(userName, groupName);
+        JoinGroupRequest joinRequest = joinGroupRequestRepository.findById(requestId)
+                .orElseThrow(() -> new EntityNotFoundException("Solicitação de entrada em grupo não encontrada"));
+        UUID userId = userService.getUserIdByJwt();
+        Group group = joinRequest.getGroup();
+//        if (!group.getOwner().getId().equals(userId)) {
+//            throw new UnauthorizedException("Você não tem permissão para rejeitar esta solicitação");
+//        }
+        joinGroupRequestRepository.delete(joinRequest);
+    }
+
 }

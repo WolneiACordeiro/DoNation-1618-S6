@@ -242,6 +242,13 @@ public class GroupController {
     }
 
     @SecurityRequirement(name = "bearerAuth")
+    @PutMapping("/join/{userName}/{groupName}/delete")
+    public ResponseEntity<Void> deleteJoinRequest(@PathVariable String userName, @PathVariable String groupName) {
+        groupService.deleteJoinRequest(userName, groupName);
+        return ResponseEntity.noContent().build();
+    }
+
+    @SecurityRequirement(name = "bearerAuth")
     @GetMapping("/search")
     public ResponseEntity<List<GroupWithJoinDTO>> searchGroups(
             @RequestParam(value = "term", required = false) String term
