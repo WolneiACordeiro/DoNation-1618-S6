@@ -31,6 +31,8 @@ public interface UserRepository extends Neo4jRepository<User, UUID> {
 
     Optional<User> findUserByUsername(String username);
 
+    Optional<User> findUserById(UUID userId);
+
     String getUsernameById(UUID id);
 
     @Query("MATCH (g:User {username: $userName}) RETURN g.id")
