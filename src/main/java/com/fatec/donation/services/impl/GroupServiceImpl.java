@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -325,11 +326,10 @@ public class GroupServiceImpl implements GroupService {
         UUID requestId = joinGroupRequestRepository.findJoinRequestIdByUserNameAndGroupName(userName, groupName);
         JoinGroupRequest joinRequest = joinGroupRequestRepository.findById(requestId)
                 .orElseThrow(() -> new EntityNotFoundException("Solicitação de entrada em grupo não encontrada"));
-        UUID userId = userService.getUserIdByJwt();
-        Group group = joinRequest.getGroup();
-//        if (!group.getOwner().getId().equals(userId)) {
-//            throw new UnauthorizedException("Você não tem permissão para rejeitar esta solicitação");
-//        }
+        Optional<User> user = userRepository.findUserByUsername(userName);
+        if (!user.get().getUsername().equals(userName)) {
+            throw new UnauthorizedException("Você não tem permissão para cancelar esta solicitação");
+        }
         joinGroupRequestRepository.delete(joinRequest);
     }
 
