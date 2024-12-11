@@ -17,6 +17,7 @@ public class GroupSimpleDTO {
     private String description;
     private String address;
     private UserOwnerDTO owner;
+    private List<UserDTO> members;
     private String groupImage;
     private String landscapeImage;
     private Long users;

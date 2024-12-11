@@ -64,6 +64,7 @@ public class JoinRequestMapper {
         groupDTO.setDescription(group.getDescription());
         groupDTO.setAddress(group.getAddress());
         groupDTO.setOwner(userRepository.findOwnerDTOByGroupId(group.getId()));
+        groupDTO.setMembers(userRepository.findTop5UsersByGroupId(group.getId()));
         groupRepository.findByGroupnameAndRelationTypeDTO(group.getGroupname(), "PROFILE_IMAGE")
                 .map(GroupImagesDTO::getName)
                 .ifPresent(groupDTO::setGroupImage);
