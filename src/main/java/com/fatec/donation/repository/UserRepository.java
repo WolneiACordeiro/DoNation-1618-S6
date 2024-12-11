@@ -60,6 +60,8 @@ public interface UserRepository extends Neo4jRepository<User, UUID> {
 
     User findByUsername(@Param("username") String username);
 
+    Optional<User> findOptionalByUsername(@Param("username") String username);
+
     @Query("MATCH (user:User)<-[:REQUESTED_BY]-(joinRequest:JoinRequest {id: $joinRequestId}) RETURN user")
     User findUserByJoinRequestId(UUID joinRequestId);
 

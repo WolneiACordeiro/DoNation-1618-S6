@@ -175,6 +175,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true, transactionManager = "transactionManager")
+    public UserDTO getOptionalUserProfile(String userName) {
+        userRepository.findOptionalByUsername(userName).
+                orElseThrow(() -> new EntityNotFoundException("Perfil de usuário não encontrado."));
+        return userMapper.toUserDTO(userRepository.findByUsername(userName));
+    }
+
+    @Override
+    @Transactional(readOnly = true, transactionManager = "transactionManager")
     public UUID getUserIdByJwt() {
         String token = JwtService.extractTokenFromRequest(request);
         String email = jwtService.getEmailFromToken(token);

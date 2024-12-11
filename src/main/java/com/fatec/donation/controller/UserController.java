@@ -169,4 +169,12 @@ public class UserController {
         UserDTO responseUser = userMapper.toUserDTO(user);
         return new ResponseEntity<>(responseUser, HttpStatus.OK);
     }
+
+    @SecurityRequirement(name = "bearerAuth")
+    @GetMapping("/profile/{userName}")
+    public ResponseEntity<UserDTO> getOptionalUserProfile(@PathVariable String userName) {
+        return new ResponseEntity<>(userService.getOptionalUserProfile(userName), HttpStatus.OK);
+    }
+
+
 }
