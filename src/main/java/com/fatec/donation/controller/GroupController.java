@@ -243,8 +243,8 @@ public class GroupController {
 
     @SecurityRequirement(name = "bearerAuth")
     @PutMapping("/join/{userName}/{groupName}/delete")
-    public ResponseEntity<Void> deleteJoinRequest(@PathVariable String userName, @PathVariable String groupName) {
-        groupService.deleteJoinRequest(userName, groupName);
+    public ResponseEntity<Void> deleteJoinRequest(@PathVariable String groupName) {
+        groupService.deleteJoinRequest(groupName);
         return ResponseEntity.noContent().build();
     }
 

@@ -21,7 +21,7 @@ public interface GroupService {
     void createJoinRequest(String groupName);
     void acceptJoinRequest(String userName, String groupName);
     void rejectJoinRequest(String userName, String groupName);
-    void deleteJoinRequest(String userName, String groupName);
+    void deleteJoinRequest(String userName);
     void blockJoinRequest(String groupName, String userName);
     void unblockJoinRequest(String groupName, String userName);
     List<GroupWithJoinDTO> searchGroupsExcludingOwnerOrMember(String searchTerm);
