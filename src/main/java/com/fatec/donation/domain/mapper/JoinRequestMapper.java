@@ -56,7 +56,7 @@ public class JoinRequestMapper {
     }
 
     public List<JoinRequestDTO> toJoinRequestDTOByUserReceive(UUID userId) {
-        List<JoinRequestDTO> joins = joinGroupRequestRepository.findJoinRequestDTOByUserId(userId);
+        List<JoinRequestDTO> joins = joinGroupRequestRepository.findJoinRequestDTOReceiveByUserId(userId);
 
         return joins.stream()
                 .map(join -> {
