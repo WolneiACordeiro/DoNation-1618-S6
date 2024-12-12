@@ -212,9 +212,15 @@ public class GroupServiceImpl implements GroupService {
     public List<JoinRequestDTO> searchUserJoinRequests() {
         UUID userId = userService.getUserIdByJwt();
         List<JoinRequestDTO> requestDetails = joinRequestMapper.toJoinRequestDTOByUser(userId);
-
         return requestDetails;
+    }
 
+    @Override
+    @Transactional(transactionManager = "transactionManager")
+    public List<JoinRequestDTO> searchUserJoinRequestsReceive() {
+        UUID userId = userService.getUserIdByJwt();
+        List<JoinRequestDTO> requestDetails = joinRequestMapper.toJoinRequestDTOByUserReceive(userId);
+        return requestDetails;
     }
 
     @Override
