@@ -87,10 +87,17 @@ public class JoinRequestMapper {
         groupDTO.setUsers(groupRepository.findTotalUsersInGroupIncludingOwner(group.getId()));
 
 
-        UserSimpleDTO userDTO = new UserSimpleDTO();
+//        UserSimpleDTO userDTO = new UserSimpleDTO();
+//        userDTO.setName(user.getName());
+//        userDTO.setUsername(user.getUsername());
+//        userDTO.setEmail(user.getEmail());
+
+        UserDTO userDTO = new UserDTO();
         userDTO.setName(user.getName());
         userDTO.setUsername(user.getUsername());
         userDTO.setEmail(user.getEmail());
+        userDTO.setUserImage(user.getUserImage().toString());
+        userDTO.setLandscapeImage(user.getLandscapeImage().toString());
 
         return new JoinRequestDTO(joinRequestId, groupDTO, userDTO);
     }

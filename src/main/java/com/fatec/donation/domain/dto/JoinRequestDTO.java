@@ -8,12 +8,12 @@ import java.util.UUID;
 public class JoinRequestDTO {
     private UUID id;
     private GroupSimpleDTO group;
-    private UserSimpleDTO user;
+    private UserDTO user;
 
     public JoinRequestDTO() {
     }
 
-    public JoinRequestDTO(UUID id, GroupSimpleDTO group, UserSimpleDTO user) {
+    public JoinRequestDTO(UUID id, GroupSimpleDTO group, UserDTO user) {
         this.id = id;
         this.group = group;
         this.user = user;
