@@ -5,6 +5,7 @@ import com.fatec.donation.domain.entity.Group;
 import com.fatec.donation.domain.entity.User;
 import com.fatec.donation.repository.GroupRepository;
 import com.fatec.donation.repository.JoinGroupRequestRepository;
+import com.fatec.donation.repository.UserImagesRepository;
 import com.fatec.donation.repository.UserRepository;
 import com.fatec.donation.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,9 @@ public class JoinRequestMapper {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private UserImagesRepository userImagesRepository;
 
     @Autowired
     private UserService userService;
@@ -96,8 +100,8 @@ public class JoinRequestMapper {
         userDTO.setName(user.getName());
         userDTO.setUsername(user.getUsername());
         userDTO.setEmail(user.getEmail());
-        userDTO.setUserImage(user.getUserImage().toString());
-        userDTO.setLandscapeImage(user.getLandscapeImage().toString());
+        userDTO.setUserImage(userImagesRepository.findProfileImageNameByUserEmail(user.getEmail()).toString());
+        userDTO.setLandscapeImage(userImagesRepository.findLandscapeImageNameByUserEmail(user.getEmail()).toString());
 
         return new JoinRequestDTO(joinRequestId, groupDTO, userDTO);
     }
