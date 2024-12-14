@@ -73,6 +73,24 @@ public class JoinRequestMapper {
                 .collect(Collectors.toList());
     }
 
+    public List<UserDTO> toMembersDTO(List<UserDTO> groups) {
+        return groups.stream()
+                .map(userDTO -> {
+                    String profileImage = userImagesRepository.findProfileImageNameByUserEmail(userDTO.getEmail()).get();
+                    if (profileImage != null) {
+                        userDTO.setUserImage(profileImage);
+                    }
+
+                    String landscapeImage = userImagesRepository.findLandscapeImageNameByUserEmail(userDTO.getEmail()).get();
+                    if (landscapeImage != null) {
+                        userDTO.setLandscapeImage(landscapeImage);
+                    }
+
+                    return userDTO;
+                })
+                .collect(Collectors.toList());
+    }
+
 
     public JoinRequestDTO mapToDTO(UUID joinRequestId, Group group, User user) {
 
@@ -82,7 +100,8 @@ public class JoinRequestMapper {
         groupDTO.setDescription(group.getDescription());
         groupDTO.setAddress(group.getAddress());
         groupDTO.setOwner(userRepository.findOwnerDTOByGroupId(group.getId()));
-        groupDTO.setMembers(userRepository.findTop5UsersByGroupId(group.getId()));
+        List<UserDTO> groups = userRepository.findTop5UsersByGroupId(group.getId());
+        groupDTO.setMembers(toMembersDTO(groups));
         Optional<GroupImagesDTO> profileImageOpt = groupRepository.findByGroupnameAndRelationTypeDTO(group.getGroupname(), "PROFILE_IMAGE");
         profileImageOpt.map(GroupImagesDTO::getName).ifPresent(groupDTO::setGroupImage);
         Optional<GroupImagesDTO> landscapeImageOpt = groupRepository.findByGroupnameAndRelationTypeDTO(group.getGroupname(), "LANDSCAPE_IMAGE");
