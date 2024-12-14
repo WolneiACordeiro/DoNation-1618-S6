@@ -218,12 +218,12 @@ public class UserServiceImpl implements UserService {
 
     private String fetchUserProfileImage(String email) {
         // Busca diretamente a string do nome da imagem
-        return userImagesRepository.findProfileImageNameByUserEmail(email).orElse(null);
+        return userImagesRepository.findProfileImageNameByUserEmail(email).orElseThrow();
     }
 
     private String fetchUserLandscapeImage(String email) {
         // Busca diretamente a string do nome da imagem
-        return userImagesRepository.findLandscapeImageNameByUserEmail(email).orElse(null);
+        return userImagesRepository.findLandscapeImageNameByUserEmail(email).orElseThrow();
     }
 
     // Método utilitário para verificar strings nulas ou vazias

@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -82,12 +83,10 @@ public class JoinRequestMapper {
         groupDTO.setAddress(group.getAddress());
         groupDTO.setOwner(userRepository.findOwnerDTOByGroupId(group.getId()));
         groupDTO.setMembers(userRepository.findTop5UsersByGroupId(group.getId()));
-        groupRepository.findByGroupnameAndRelationTypeDTO(group.getGroupname(), "PROFILE_IMAGE")
-                .map(GroupImagesDTO::getName)
-                .ifPresent(groupDTO::setGroupImage);
-        groupRepository.findByGroupnameAndRelationTypeDTO(group.getGroupname(), "LANDSCAPE_IMAGE")
-                .map(GroupImagesDTO::getName)
-                .ifPresent(groupDTO::setLandscapeImage);
+        Optional<GroupImagesDTO> profileImageOpt = groupRepository.findByGroupnameAndRelationTypeDTO(group.getGroupname(), "PROFILE_IMAGE");
+        profileImageOpt.map(GroupImagesDTO::getName).ifPresent(groupDTO::setGroupImage);
+        Optional<GroupImagesDTO> landscapeImageOpt = groupRepository.findByGroupnameAndRelationTypeDTO(group.getGroupname(), "LANDSCAPE_IMAGE");
+        landscapeImageOpt.map(GroupImagesDTO::getName).ifPresent(groupDTO::setLandscapeImage);
         groupDTO.setUsers(groupRepository.findTotalUsersInGroupIncludingOwner(group.getId()));
 
 
@@ -100,8 +99,10 @@ public class JoinRequestMapper {
         userDTO.setName(user.getName());
         userDTO.setUsername(user.getUsername());
         userDTO.setEmail(user.getEmail());
-        userDTO.setUserImage(userImagesRepository.findProfileImageNameByUserEmail(user.getEmail()).toString());
-        userDTO.setLandscapeImage(userImagesRepository.findLandscapeImageNameByUserEmail(user.getEmail()).toString());
+        Optional<String> userProfile = userImagesRepository.findProfileImageNameByUserEmail(user.getEmail());
+        Optional<String> userLandscape = userImagesRepository.findLandscapeImageNameByUserEmail(user.getEmail());
+        userDTO.setUserImage(userProfile.get());
+        userDTO.setLandscapeImage(userLandscape.get());
 
         return new JoinRequestDTO(joinRequestId, groupDTO, userDTO);
     }
