@@ -2,10 +2,7 @@ package com.fatec.donation.services.impl;
 
 import com.fatec.donation.client.CursedWordsService;
 import com.fatec.donation.domain.dto.UserDTO;
-import com.fatec.donation.domain.entity.AccessToken;
-import com.fatec.donation.domain.entity.CursedWord;
-import com.fatec.donation.domain.entity.ResponseCursedWord;
-import com.fatec.donation.domain.entity.User;
+import com.fatec.donation.domain.entity.*;
 import com.fatec.donation.domain.images.UserImages;
 import com.fatec.donation.domain.mapper.UserMapper;
 import com.fatec.donation.domain.request.CompleteUserRequest;
@@ -16,6 +13,7 @@ import com.fatec.donation.exceptions.EntityNotFoundException;
 import com.fatec.donation.exceptions.IllegalArgumentException;
 import com.fatec.donation.exceptions.ResourceNotFoundException;
 import com.fatec.donation.jwt.JwtService;
+import com.fatec.donation.repository.ChatMessageRepository;
 import com.fatec.donation.repository.GroupRepository;
 import com.fatec.donation.repository.UserImagesRepository;
 import com.fatec.donation.repository.UserRepository;
@@ -26,8 +24,11 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -36,6 +37,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -232,6 +234,18 @@ public class UserServiceImpl implements UserService {
     }
 
     // Métodos auxiliares
+
+    @Autowired
+    private ChatMessageRepository chatMessageRepository;
+
+    @MessageMapping("/sendMessage")
+    @SendTo("/topic/chat")
+    public ChatMessage sendMessage(ChatMessage message) {
+        message.setTimestamp(LocalDateTime.now());
+        chatMessageRepository.save(message);
+        return message;
+    }
+
 
     @Cacheable(value = "emailExists", key = "#email")
     private boolean isEmailAlreadyExists(String email) {
