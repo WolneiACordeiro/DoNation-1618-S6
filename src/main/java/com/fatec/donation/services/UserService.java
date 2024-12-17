@@ -30,4 +30,5 @@ public interface UserService {
     void logout(String token);
     List<UserDTO> findTop5UsersWithImages(UUID groupId);
     UserDTO getOptionalUserProfile(String userName);
+    List<UserDTO> findTop5UsersWithRelation();
 }

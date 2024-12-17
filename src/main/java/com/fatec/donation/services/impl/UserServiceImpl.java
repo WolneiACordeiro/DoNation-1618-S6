@@ -53,7 +53,7 @@ public class UserServiceImpl implements UserService {
     private final HttpServletRequest request;
     private final UserMapper userMapper;
     private final PlatformTransactionManager transactionManager;
-    private  final UserImagesService userImagesService;
+    private final UserImagesService userImagesService;
     private final UserImagesRepository userImagesRepository;
 
     @Override
@@ -198,23 +198,34 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com o ID: " + userId));
     }
 
+    @Override
+    @Transactional(readOnly = true, transactionManager = "transactionManager")
     public List<UserDTO> findTop5UsersWithImages(UUID groupId) {
-        // Busca os usuários vinculados ao grupo
         List<UserDTO> users = userRepository.findTop5UsersByGroupId(groupId);
-
-        // Itera pelos usuários para preencher as imagens ausentes
         for (UserDTO user : users) {
-            // Verifica e obtém a imagem de perfil se estiver ausente
             if (isNullOrEmpty(user.getUserImage())) {
                 user.setUserImage(fetchUserProfileImage(user.getEmail()));
             }
-
-            // Verifica e obtém a imagem de paisagem se estiver ausente
             if (isNullOrEmpty(user.getLandscapeImage())) {
                 user.setLandscapeImage(fetchUserLandscapeImage(user.getEmail()));
             }
         }
+        return users;
+    }
 
+    @Override
+    @Transactional(readOnly = true, transactionManager = "transactionManager")
+    public List<UserDTO> findTop5UsersWithRelation() {
+        UUID userId = this.getUserIdByJwt();
+        List<UserDTO> users = userRepository.findUsersWithRelatedConnections(userId);
+        for (UserDTO user : users) {
+            if (isNullOrEmpty(user.getUserImage())) {
+                user.setUserImage(fetchUserProfileImage(user.getEmail()));
+            }
+            if (isNullOrEmpty(user.getLandscapeImage())) {
+                user.setLandscapeImage(fetchUserLandscapeImage(user.getEmail()));
+            }
+        }
         return users;
     }
 

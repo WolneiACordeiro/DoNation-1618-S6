@@ -72,4 +72,17 @@ public interface UserRepository extends Neo4jRepository<User, UUID> {
             "RETURN u")
     User findUserByDonationId(UUID donationId);
 
+    @Query("MATCH (target:User {id: $userId}) " +
+            "OPTIONAL MATCH (target)-[:MEMBER]->(g:Group)<-[:MEMBER]-(connectedUser:User) " +
+            "WITH target, COLLECT(DISTINCT connectedUser) AS connectedUsers " +
+            "MATCH (allUsers:User) " +
+            "WHERE target.id <> allUsers.id " +
+            "RETURN CASE " +
+            "       WHEN allUsers IN connectedUsers THEN 1 ELSE 2 " +
+            "       END AS priority, " +
+            "       allUsers " +
+            "ORDER BY priority ASC " +
+            "LIMIT 5")
+    List<UserDTO> findUsersWithRelatedConnections(@Param("userId") UUID userId);
+
 }

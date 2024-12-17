@@ -29,6 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -174,6 +175,12 @@ public class UserController {
     @GetMapping("/profile/{userName}")
     public ResponseEntity<UserDTO> getOptionalUserProfile(@PathVariable String userName) {
         return new ResponseEntity<>(userService.getOptionalUserProfile(userName), HttpStatus.OK);
+    }
+
+    @SecurityRequirement(name = "bearerAuth")
+    @GetMapping("/advice")
+    public ResponseEntity<List<UserDTO>> getUsersAdvice() {
+        return new ResponseEntity<>(userService.findTop5UsersWithRelation(), HttpStatus.OK);
     }
 
 
