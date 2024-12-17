@@ -1,9 +1,6 @@
 package com.fatec.donation.controller;
 
-import com.fatec.donation.domain.dto.DonationDTO;
-import com.fatec.donation.domain.dto.GroupDTO;
-import com.fatec.donation.domain.dto.GroupWithJoinDTO;
-import com.fatec.donation.domain.dto.JoinRequestDTO;
+import com.fatec.donation.domain.dto.*;
 import com.fatec.donation.domain.request.CreateDonationRequest;
 import com.fatec.donation.domain.request.CreateGroupRequest;
 import com.fatec.donation.domain.request.DonationRequest;
@@ -63,11 +60,11 @@ public class DonationController {
     }
 
     @PostMapping(value = "{donationId}/{groupName}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<DonationRequest> createDonationRequest(
+    public ResponseEntity<DonationRequestDTO> createDonationRequest(
             @PathVariable UUID donationId,
             @PathVariable String groupName) {
         try {
-            DonationRequest donationCreated = donationService.createDonationRequest(donationId, groupName);
+            DonationRequestDTO donationCreated = donationService.createDonationRequest(donationId, groupName);
             return ResponseEntity.status(HttpStatus.CREATED).body(donationCreated);
         } catch (IOException e) {
             throw new RuntimeException("Error handling request upload", e);

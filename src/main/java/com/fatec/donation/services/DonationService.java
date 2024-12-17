@@ -1,6 +1,7 @@
 package com.fatec.donation.services;
 
 import com.fatec.donation.domain.dto.DonationDTO;
+import com.fatec.donation.domain.dto.DonationRequestDTO;
 import com.fatec.donation.domain.request.CreateDonationRequest;
 import com.fatec.donation.domain.request.DonationRequest;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +15,6 @@ public interface DonationService {
     DonationDTO createDonation(CreateDonationRequest request, MultipartFile imageFile, String groupName) throws IOException;
 
     @Transactional(transactionManager = "transactionManager")
-    DonationRequest createDonationRequest(UUID donationID, String groupName) throws IOException;
+    DonationRequestDTO createDonationRequest(UUID donationID, String groupName) throws IOException;
 
 }

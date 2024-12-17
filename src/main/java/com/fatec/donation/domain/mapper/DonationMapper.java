@@ -1,9 +1,6 @@
 package com.fatec.donation.domain.mapper;
 
-import com.fatec.donation.domain.dto.DonationDTO;
-import com.fatec.donation.domain.dto.GroupDTO;
-import com.fatec.donation.domain.dto.GroupImagesDTO;
-import com.fatec.donation.domain.dto.GroupWithJoinDTO;
+import com.fatec.donation.domain.dto.*;
 import com.fatec.donation.domain.entity.ChatMessage;
 import com.fatec.donation.domain.entity.Donation;
 import com.fatec.donation.domain.entity.Group;
@@ -40,11 +37,12 @@ public class DonationMapper {
     GroupRepository groupRepository;
     @Autowired
     UserRepository userRepository;
-    @Autowired
-    UserService userService;
 
     @Autowired
     GroupMapper groupMapper;
+
+    @Autowired
+    UserMapper userMapper;
 
     @Autowired
     JoinGroupRequestRepository joinGroupRequestRepository;
@@ -56,15 +54,26 @@ public class DonationMapper {
         return avaliability;
     }
 
+    public DonationRequestDTO toDonationRequestDTO(DonationRequest donation) {
+        DonationRequestDTO donationRequestDTO = new DonationRequestDTO();
+        donationRequestDTO.setId(donation.getId());
+        donationRequestDTO.setUserReceiver(userMapper.toUserDTO(userRepository.findByUsername(donation.getUserReceiver().getUsername())));
+        donationRequestDTO.setUserDonor(userMapper.toUserDTO(userRepository.findByUsername(donation.getUserDonor().getUsername())));
+        donationRequestDTO.setGroup(groupMapper.toGroupDTO(donation.getGroup()));
+        donationRequestDTO.setCreatedAt(donation.getCreatedAt().toString());
+        donationRequestDTO.setDonationStatus(donation.getDonationStatus());
+        return donationRequestDTO;
+    }
+
     public DonationDTO toDonationDTO(Donation donation) {
         DonationDTO donationDTO = new DonationDTO();
-        donationDTO.setDonationName(donation.getName());
+        donationDTO.setName(donationDTO.getName());
         donationDTO.setDescription(donation.getDescription());
         donationDTO.setAddress(donation.getAddress());
         donationDTO.setTags(donation.getTags());
-        donationDTO.setOwner(userRepository.findOwnerDTOByGroupId(donation.getGroup().getId()));
+        donationDTO.setDonor(userRepository.findOwnerDTOByGroupId(donation.getGroup().getId()));
         donationDTO.setGroup(groupMapper.toGroupDTO(groupRepository.findByGroupname(donation.getGroup().getGroupname())));
-        donationDTO.setAvaliableDate(donation.getAvaliableDate());
+        donationDTO.setAvaliableDate(donation.getAvaliableDate().stream().toList());
         donationDTO.setDonationImage(donation.getDonationImage().getName());
         donationDTO.setAvailability(returnAvaliability(donation.getAvailability()));
         return donationDTO;

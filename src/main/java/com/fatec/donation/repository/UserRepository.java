@@ -67,7 +67,7 @@ public interface UserRepository extends Neo4jRepository<User, UUID> {
     @Query("MATCH (user:User)<-[:REQUESTED_BY]-(joinRequest:JoinRequest {id: $joinRequestId}) RETURN user")
     User findUserByJoinRequestId(UUID joinRequestId);
 
-    @Query("MATCH (u:User)-[:DONOR]->(d:Donation) " +
+    @Query("MATCH (u:User)<-[:DONOR]-(d:Donation) " +
             "WHERE d.id = $donationId " +
             "RETURN u")
     User findUserByDonationId(UUID donationId);

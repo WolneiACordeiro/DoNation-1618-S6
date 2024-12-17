@@ -1,11 +1,16 @@
 package com.fatec.donation.services.impl;
 
 import com.fatec.donation.domain.dto.DonationDTO;
+import com.fatec.donation.domain.dto.DonationRequestDTO;
+import com.fatec.donation.domain.dto.GroupDTO;
+import com.fatec.donation.domain.dto.UserDTO;
 import com.fatec.donation.domain.entity.Donation;
 import com.fatec.donation.domain.entity.Group;
 import com.fatec.donation.domain.entity.User;
 import com.fatec.donation.domain.images.DonationImages;
 import com.fatec.donation.domain.mapper.DonationMapper;
+import com.fatec.donation.domain.mapper.GroupMapper;
+import com.fatec.donation.domain.mapper.UserMapper;
 import com.fatec.donation.domain.request.CreateDonationRequest;
 import com.fatec.donation.domain.request.DonationRequest;
 import com.fatec.donation.exceptions.EntityNotFoundException;
@@ -34,6 +39,8 @@ public class DonationServiceImpl implements DonationService {
     private final GroupRepository groupRepository;
     private final DonationImagesService donationImagesService;
     private final DonationMapper donationMapper;
+    private final UserMapper userMapper;
+    private final GroupMapper groupMapper;
     private final JoinGroupRequestRepository joinGroupRequestRepository;
 
     @Override
@@ -68,7 +75,7 @@ public class DonationServiceImpl implements DonationService {
 
     @Override
     @Transactional(transactionManager = "transactionManager")
-    public DonationRequest createDonationRequest(UUID donationID, String groupName) throws IOException {
+    public DonationRequestDTO createDonationRequest(UUID donationID, String groupName) throws IOException {
         // Obtendo o ID do usuário a partir do JWT
         UUID userId = userService.getUserIdByJwt();
         User user = userRepository.findById(userId)
@@ -89,6 +96,6 @@ public class DonationServiceImpl implements DonationService {
 
         DonationRequest savedDonation = donationRequestRepository.save(donationRequest);
 
-        return savedDonation;
+        return donationMapper.toDonationRequestDTO(savedDonation);
     }
 }
