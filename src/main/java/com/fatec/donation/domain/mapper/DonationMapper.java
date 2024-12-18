@@ -60,6 +60,7 @@ public class DonationMapper {
         donationRequestDTO.setUserDonor(userMapper.toUserDTO(userRepository.findByUsername(donation.getUserDonor().getUsername())));
         donationRequestDTO.setGroup(groupMapper.toGroupDTO(donation.getGroup()));
         donationRequestDTO.setCreatedAt(donation.getCreatedAt().toString());
+        donationRequestDTO.setDonation(toDonationDTO(donationRepository.findById(donation.getId()).get()));
         donationRequestDTO.setDonationStatus(donation.getDonationStatus());
         return donationRequestDTO;
     }
@@ -130,6 +131,7 @@ public class DonationMapper {
                 .userDonor(userRepository.findUserByDonationId(donationId))
                 .donationStatus(DonationStatus.REQUESTED)
                 .createdAt(LocalDateTime.now())
+                .donation(donationRepository.findById(donationId).get())
                 .group(group)
                 .chatMessages(null)
                 .build();

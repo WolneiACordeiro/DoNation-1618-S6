@@ -1,6 +1,7 @@
 package com.fatec.donation.domain.request;
 
 import com.fatec.donation.domain.entity.ChatMessage;
+import com.fatec.donation.domain.entity.Donation;
 import com.fatec.donation.domain.entity.Group;
 import com.fatec.donation.domain.entity.User;
 import com.fatec.donation.domain.enums.DonationStatus;
@@ -33,6 +34,8 @@ public class DonationRequest {
     private Group group;
     private LocalDateTime createdAt;
     private DonationStatus donationStatus;
+    @Relationship(type = "DONATION_REQUESTED", direction = Relationship.Direction.OUTGOING)
+    private Donation donation;
     @Relationship(type = "HAS_CHAT", direction = Relationship.Direction.OUTGOING)
     private List<ChatMessage> chatMessages = new ArrayList<>();
     public DonationRequest() {

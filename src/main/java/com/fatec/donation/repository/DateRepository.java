@@ -8,9 +8,10 @@ import java.util.HashSet;
 import java.util.UUID;
 
 public interface DateRepository extends Neo4jRepository<Date, UUID> {
+
     @Query("MATCH (d:Donation {id: $donationId})-[:AVALIABLE_DATE]->(date:Date) " +
-            "WHERE 'MONDAY' IN date.day " +
             "RETURN date.avaliableTime AS avaliableTime, date.day AS day")
     HashSet<Date> findAvailableDatesByDonationId(UUID donationId);
+
 }
 
