@@ -10,10 +10,7 @@ import com.fatec.donation.domain.request.CreateDonationRequest;
 import com.fatec.donation.domain.request.CreateGroupRequest;
 import com.fatec.donation.domain.request.DonationRequest;
 import com.fatec.donation.domain.request.UpdateGroupRequest;
-import com.fatec.donation.repository.DonationRepository;
-import com.fatec.donation.repository.GroupRepository;
-import com.fatec.donation.repository.JoinGroupRequestRepository;
-import com.fatec.donation.repository.UserRepository;
+import com.fatec.donation.repository.*;
 import com.fatec.donation.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -39,10 +36,16 @@ public class DonationMapper {
     UserRepository userRepository;
 
     @Autowired
+    DonationImagesRepository donationImagesRepository;
+
+    @Autowired
     GroupMapper groupMapper;
 
     @Autowired
     UserMapper userMapper;
+
+    @Autowired
+    DateRepository dateRepository;
 
     @Autowired
     JoinGroupRequestRepository joinGroupRequestRepository;
@@ -57,6 +60,25 @@ public class DonationMapper {
         donationRequestDTO.setDonationStatus(donation.getDonationStatus());
         return donationRequestDTO;
     }
+
+    public List<DonationSearchDTO> toDonationSearchDTOList(List<DonationSearchDTO> donations) {
+        return donations.stream()
+                .map(this::toDonationSearchDTO)
+                .collect(Collectors.toList());
+    }
+
+    public DonationSearchDTO toDonationSearchDTO(DonationSearchDTO donation) {
+        donation.setDonor(userRepository.findDonorDTOByDonationId(donation.getId()));
+        donation.setDonationImage(donationImagesRepository.findImageNamesByDonationId(donation.getId()));
+        donation.setAvaliableDate(dateRepository.findAvailableDatesByDonationId(donation.getId()));
+        if (donation.getAvailability() == null || donation.getAvailability().isBlank()) {
+            donation.setAvailability("INF");
+        }
+        donation.setAvailability(donation.getAvailability());
+
+        return donation;
+    }
+
 
     public DonationDTO toDonationDTO(Donation donation) {
         DonationDTO donationDTO = new DonationDTO();

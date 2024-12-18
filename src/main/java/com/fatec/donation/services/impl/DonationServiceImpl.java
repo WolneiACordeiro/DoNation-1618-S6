@@ -2,8 +2,7 @@ package com.fatec.donation.services.impl;
 
 import com.fatec.donation.domain.dto.DonationDTO;
 import com.fatec.donation.domain.dto.DonationRequestDTO;
-import com.fatec.donation.domain.dto.GroupDTO;
-import com.fatec.donation.domain.dto.UserDTO;
+import com.fatec.donation.domain.dto.DonationSearchDTO;
 import com.fatec.donation.domain.entity.Donation;
 import com.fatec.donation.domain.entity.Group;
 import com.fatec.donation.domain.entity.User;
@@ -26,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -71,6 +71,25 @@ public class DonationServiceImpl implements DonationService {
         Donation savedDonation = donationRepository.save(donation);
 
         return donationMapper.toDonationDTO(savedDonation);
+    }
+
+    @Override
+    @Transactional(transactionManager = "transactionManager")
+    public List<DonationSearchDTO> searchDonation(String groupName, String searchTerm) {
+        if (searchTerm == null || searchTerm.trim().isEmpty()) {
+            searchTerm = "";
+        }
+        UUID userId = userService.getUserIdByJwt();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
+        UUID groupId = groupRepository.findIdByGroupname(groupName);
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new EntityNotFoundException("Grupo não encontrado"));
+        if (Boolean.FALSE.equals(groupRepository.memberByUserIdAndGroupName(userId, groupName)) &&
+                Boolean.FALSE.equals(joinGroupRequestRepository.ownerByUserIdAndGroupId(userId, groupId))) {
+            throw new IllegalStateException("Você não pertence a este grupo");
+        }
+        return donationMapper.toDonationSearchDTOList(donationRepository.findDonationsByGroupAndSearchTerm(groupId, searchTerm));
     }
 
     @Override

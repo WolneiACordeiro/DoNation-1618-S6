@@ -59,6 +59,16 @@ public class DonationController {
         }
     }
 
+    @SecurityRequirement(name = "bearerAuth")
+    @GetMapping("/search/donations")
+    public ResponseEntity<List<DonationSearchDTO>> searchGroupsMember(
+            @RequestParam(value = "groupname", required = true) String groupname,
+            @RequestParam(value = "term", required = false) String term
+    ) {
+        List<DonationSearchDTO> donationDTOS = donationService.searchDonation(groupname, term);
+        return ResponseEntity.ok(donationDTOS);
+    }
+
     @PostMapping(value = "{donationId}/{groupName}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<DonationRequestDTO> createDonationRequest(
             @PathVariable UUID donationId,

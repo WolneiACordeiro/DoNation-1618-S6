@@ -4,6 +4,7 @@ import com.fatec.donation.domain.images.DonationImages;
 import com.fatec.donation.domain.images.GroupImages;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.neo4j.repository.query.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -14,5 +15,10 @@ public interface DonationImagesRepository extends Neo4jRepository<DonationImages
     @Query("MATCH (u:Group {id: $groupId})<-[:PROFILE_IMAGE]-(img:GroupImages) " +
             "RETURN img")
     Optional<DonationImages> findByGroupIdProfile(UUID groupId);
+
+    @Query("MATCH (d:Donation {id: $donationId})<-[:DONATION_IMAGE]-(di:DonationImages) " +
+            "RETURN di.name AS imageName")
+    String findImageNamesByDonationId(UUID donationId);
+
 }
 
