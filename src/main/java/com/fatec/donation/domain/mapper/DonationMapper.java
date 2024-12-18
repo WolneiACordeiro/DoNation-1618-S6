@@ -48,7 +48,7 @@ public class DonationMapper {
     JoinGroupRequestRepository joinGroupRequestRepository;
 
     public String returnAvaliability(String avaliability){
-        if(!avaliability.isEmpty()){
+        if(avaliability.isEmpty() || avaliability.isBlank()){
             avaliability = "INF";
         }
         return avaliability;
@@ -67,17 +67,24 @@ public class DonationMapper {
 
     public DonationDTO toDonationDTO(Donation donation) {
         DonationDTO donationDTO = new DonationDTO();
-        donationDTO.setName(donationDTO.getName());
+        donationDTO.setName(donation.getName());
         donationDTO.setDescription(donation.getDescription());
+        donationDTO.setCreatedAt(donation.getCreatedAt().toString());
         donationDTO.setAddress(donation.getAddress());
         donationDTO.setTags(donation.getTags());
         donationDTO.setDonor(userRepository.findOwnerDTOByGroupId(donation.getGroup().getId()));
         donationDTO.setGroup(groupMapper.toGroupDTO(groupRepository.findByGroupname(donation.getGroup().getGroupname())));
         donationDTO.setAvaliableDate(donation.getAvaliableDate().stream().toList());
         donationDTO.setDonationImage(donation.getDonationImage().getName());
-        donationDTO.setAvailability(returnAvaliability(donation.getAvailability()));
+
+        if (donation.getAvailability() == null || donation.getAvailability().isBlank()) {
+            donation.setAvailability("INF");
+        }
+        donationDTO.setAvailability(donation.getAvailability());
+
         return donationDTO;
     }
+
 
     public Donation toDonation(CreateDonationRequest request, User donor, Group group) throws IOException {
         return Donation.builder()
