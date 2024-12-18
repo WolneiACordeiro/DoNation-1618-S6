@@ -47,13 +47,6 @@ public class DonationMapper {
     @Autowired
     JoinGroupRequestRepository joinGroupRequestRepository;
 
-    public String returnAvaliability(String avaliability){
-        if(avaliability.isEmpty() || avaliability.isBlank()){
-            avaliability = "INF";
-        }
-        return avaliability;
-    }
-
     public DonationRequestDTO toDonationRequestDTO(DonationRequest donation) {
         DonationRequestDTO donationRequestDTO = new DonationRequestDTO();
         donationRequestDTO.setId(donation.getId());
