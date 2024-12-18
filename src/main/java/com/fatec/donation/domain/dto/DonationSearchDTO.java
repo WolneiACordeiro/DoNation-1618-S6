@@ -22,7 +22,7 @@ public class DonationSearchDTO {
     private String address;
     private List<String> tags;
     private LocalDateTime createdAt;
-    private UserOwnerDTO donor;
+    private UserDTO donor;
     private String donationImage;
     private HashSet<Date> avaliableDate;
     private String availability;

@@ -31,7 +31,7 @@ public interface UserRepository extends Neo4jRepository<User, UUID> {
 
     @Query("MATCH (d:Donation {id: $donationId})-[:DONOR]->(u:User) " +
             "RETURN u.name AS name, u.username AS username, u.email AS email")
-    UserOwnerDTO findDonorDTOByDonationId(@Param("donationId") UUID donationId);
+    UserDTO findDonorDTOByDonationId(@Param("donationId") UUID donationId);
 
     Optional<User> findUserByUsername(String username);
 

@@ -39,6 +39,9 @@ public class DonationMapper {
     DonationImagesRepository donationImagesRepository;
 
     @Autowired
+    UserImagesRepository userImagesRepository;
+
+    @Autowired
     GroupMapper groupMapper;
 
     @Autowired
@@ -68,7 +71,10 @@ public class DonationMapper {
     }
 
     public DonationSearchDTO toDonationSearchDTO(DonationSearchDTO donation) {
-        donation.setDonor(userRepository.findDonorDTOByDonationId(donation.getId()));
+        UserDTO userDonor = userRepository.findDonorDTOByDonationId(donation.getId());
+        userDonor.setUserImage(userImagesRepository.findProfileImageNameByUserEmail(userDonor.getEmail()).get());
+        userDonor.setLandscapeImage(userImagesRepository.findLandscapeImageNameByUserEmail(userDonor.getEmail()).get());
+        donation.setDonor(userDonor);
         donation.setDonationImage(donationImagesRepository.findImageNamesByDonationId(donation.getId()));
         donation.setAvaliableDate(dateRepository.findAvailableDatesByDonationId(donation.getId()));
         if (donation.getAvailability() == null || donation.getAvailability().isBlank()) {
