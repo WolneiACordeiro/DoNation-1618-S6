@@ -12,7 +12,6 @@ import org.springframework.data.neo4j.core.schema.Relationship;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Getter

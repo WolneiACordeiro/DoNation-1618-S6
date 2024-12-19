@@ -53,14 +53,16 @@ public class DonationMapper {
     @Autowired
     JoinGroupRequestRepository joinGroupRequestRepository;
 
-    public DonationRequestDTO toDonationRequestDTO(DonationRequest donation) {
+    public DonationRequestDTO toDonationRequestDTO(DonationRequest donation, UUID donationId) {
         DonationRequestDTO donationRequestDTO = new DonationRequestDTO();
         donationRequestDTO.setId(donation.getId());
         donationRequestDTO.setUserReceiver(userMapper.toUserDTO(userRepository.findByUsername(donation.getUserReceiver().getUsername())));
         donationRequestDTO.setUserDonor(userMapper.toUserDTO(userRepository.findByUsername(donation.getUserDonor().getUsername())));
         donationRequestDTO.setGroup(groupMapper.toGroupDTO(donation.getGroup()));
         donationRequestDTO.setCreatedAt(donation.getCreatedAt().toString());
-        donationRequestDTO.setDonation(toDonationDTO(donationRepository.findById(donation.getId()).get()));
+        System.out.println("AQUI<><><><><><><><><><><><><><><><");
+        System.out.println(donationRepository.findDonationById(donationId));
+        donationRequestDTO.setDonation(toDonationDTO(donation.getDonation()));
         donationRequestDTO.setDonationStatus(donation.getDonationStatus());
         return donationRequestDTO;
     }
@@ -95,7 +97,7 @@ public class DonationMapper {
         donationDTO.setAddress(donation.getAddress());
         donationDTO.setTags(donation.getTags());
         donationDTO.setDonor(userRepository.findOwnerDTOByGroupId(donation.getGroup().getId()));
-        donationDTO.setGroup(groupMapper.toGroupDTO(groupRepository.findByGroupname(donation.getGroup().getGroupname())));
+        donationDTO.setGroup(groupMapper.toGroupDTO(groupRepository.findGroupByDonationId(donation.getId())));
         donationDTO.setAvaliableDate(donation.getAvaliableDate().stream().toList());
         donationDTO.setDonationImage(donation.getDonationImage().getName());
 
@@ -131,7 +133,7 @@ public class DonationMapper {
                 .userDonor(userRepository.findUserByDonationId(donationId))
                 .donationStatus(DonationStatus.REQUESTED)
                 .createdAt(LocalDateTime.now())
-                .donation(donationRepository.findById(donationId).get())
+                .donation(donationRepository.findDonationById(donationId))
                 .group(group)
                 .chatMessages(null)
                 .build();

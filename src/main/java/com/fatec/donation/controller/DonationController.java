@@ -69,7 +69,8 @@ public class DonationController {
         return ResponseEntity.ok(donationDTOS);
     }
 
-    @PostMapping(value = "{donationId}/{groupName}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @SecurityRequirement(name = "bearerAuth")
+    @PostMapping(value = "{donationId}/{groupName}")
     public ResponseEntity<DonationRequestDTO> createDonationRequest(
             @PathVariable UUID donationId,
             @PathVariable String groupName) {

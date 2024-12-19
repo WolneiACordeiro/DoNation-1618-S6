@@ -115,6 +115,6 @@ public class DonationServiceImpl implements DonationService {
 
         DonationRequest savedDonation = donationRequestRepository.save(donationRequest);
 
-        return donationMapper.toDonationRequestDTO(savedDonation);
+        return donationMapper.toDonationRequestDTO(savedDonation, donationID);
     }
 }

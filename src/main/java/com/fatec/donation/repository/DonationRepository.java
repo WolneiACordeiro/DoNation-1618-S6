@@ -3,9 +3,9 @@ package com.fatec.donation.repository;
 import com.fatec.donation.domain.dto.DonationDTO;
 import com.fatec.donation.domain.dto.DonationSearchDTO;
 import com.fatec.donation.domain.entity.Donation;
-import com.fatec.donation.domain.entity.User;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.neo4j.repository.query.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.UUID;
@@ -22,5 +22,12 @@ public interface DonationRepository extends Neo4jRepository<Donation, UUID> {
             "RETURN d " +
             "ORDER BY d.createdAt DESC")
     List<DonationSearchDTO> findDonationsByGroupAndSearchTerm(UUID groupId, String searchTerm);
+
+    @Query("MATCH (d:Donation {id: $donationId}) RETURN d")
+    DonationDTO findDonationdtoById(@Param("donationId") UUID donationId);
+
+    @Query("MATCH (d:Donation {id: $donationId})-[:DONATION_FROM]->(g:Group) RETURN d, g")
+    Donation findDonationById(@Param("donationId") UUID donationId);
+
 }
 
