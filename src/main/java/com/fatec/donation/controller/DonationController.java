@@ -71,11 +71,11 @@ public class DonationController {
 
     @SecurityRequirement(name = "bearerAuth")
     @PostMapping(value = "{donationId}/{groupName}")
-    public ResponseEntity<DonationRequestDTO> createDonationRequest(
+    public ResponseEntity<DonationRequest> createDonationRequest(
             @PathVariable UUID donationId,
             @PathVariable String groupName) {
         try {
-            DonationRequestDTO donationCreated = donationService.createDonationRequest(donationId, groupName);
+            DonationRequest donationCreated = donationService.createDonationRequest(donationId, groupName);
             return ResponseEntity.status(HttpStatus.CREATED).body(donationCreated);
         } catch (IOException e) {
             throw new RuntimeException("Error handling request upload", e);

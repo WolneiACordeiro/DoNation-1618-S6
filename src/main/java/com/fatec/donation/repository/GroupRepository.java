@@ -1,5 +1,6 @@
 package com.fatec.donation.repository;
 
+import com.fatec.donation.domain.dto.GroupDTO;
 import com.fatec.donation.domain.dto.GroupImagesDTO;
 import com.fatec.donation.domain.entity.Group;
 import com.fatec.donation.domain.images.GroupImages;
@@ -73,6 +74,9 @@ public interface GroupRepository extends Neo4jRepository<Group, UUID> {
 
     @Query("MATCH (donation:Donation)-[:DONATION_FROM]->(group:Group) WHERE donation.id = $donationId RETURN group")
     Group findGroupByDonationId(UUID donationId);
+
+    @Query("MATCH (d:Donation {id: $donationId})-[:DONATION_FROM]->(g:Group) RETURN g")
+    GroupDTO findGroupDTOByDonationId(@Param("donationId") UUID donationId);
 
     @Query("MATCH (group:Group {id: $groupId}) " +
             "OPTIONAL MATCH (group)<-[:MEMBER]-(members:User) " +

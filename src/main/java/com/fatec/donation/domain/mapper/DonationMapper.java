@@ -1,25 +1,23 @@
 package com.fatec.donation.domain.mapper;
 
 import com.fatec.donation.domain.dto.*;
-import com.fatec.donation.domain.entity.ChatMessage;
 import com.fatec.donation.domain.entity.Donation;
 import com.fatec.donation.domain.entity.Group;
 import com.fatec.donation.domain.entity.User;
 import com.fatec.donation.domain.enums.DonationStatus;
 import com.fatec.donation.domain.request.CreateDonationRequest;
-import com.fatec.donation.domain.request.CreateGroupRequest;
 import com.fatec.donation.domain.request.DonationRequest;
 import com.fatec.donation.domain.request.UpdateGroupRequest;
 import com.fatec.donation.repository.*;
-import com.fatec.donation.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.text.Normalizer;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -50,6 +48,8 @@ public class DonationMapper {
     @Autowired
     DateRepository dateRepository;
 
+    private static final Logger logger = LoggerFactory.getLogger(DonationMapper.class);
+
     @Autowired
     JoinGroupRequestRepository joinGroupRequestRepository;
 
@@ -58,10 +58,15 @@ public class DonationMapper {
         donationRequestDTO.setId(donation.getId());
         donationRequestDTO.setUserReceiver(userMapper.toUserDTO(userRepository.findByUsername(donation.getUserReceiver().getUsername())));
         donationRequestDTO.setUserDonor(userMapper.toUserDTO(userRepository.findByUsername(donation.getUserDonor().getUsername())));
-        donationRequestDTO.setGroup(groupMapper.toGroupDTO(donation.getGroup()));
         donationRequestDTO.setCreatedAt(donation.getCreatedAt().toString());
-        System.out.println("AQUI<><><><><><><><><><><><><><><><");
-        System.out.println(donationRepository.findDonationById(donationId));
+        logger.info("Buscando GroupDTO para donationId: {}", donationId);
+        GroupDTO groupDTO = groupMapper.toGroupDTO(groupRepository.findGroupByDonationId(donationId));
+        if (groupDTO == null) {
+            logger.error("Nenhum GroupDTO encontrado para donationId: {}", donationId);
+        } else {
+            logger.info("GroupDTO encontrado: {}", groupDTO);
+        }
+        donationRequestDTO.setGroup(null);
         donationRequestDTO.setDonation(toDonationDTO(donation.getDonation()));
         donationRequestDTO.setDonationStatus(donation.getDonationStatus());
         return donationRequestDTO;
@@ -97,7 +102,14 @@ public class DonationMapper {
         donationDTO.setAddress(donation.getAddress());
         donationDTO.setTags(donation.getTags());
         donationDTO.setDonor(userRepository.findOwnerDTOByGroupId(donation.getGroup().getId()));
-        donationDTO.setGroup(groupMapper.toGroupDTO(groupRepository.findGroupByDonationId(donation.getId())));
+        UUID donationId = donation.getId();
+        GroupDTO groupDTO = groupMapper.toGroupDTO(groupRepository.findGroupByDonationId(donationId));
+        if (groupDTO == null) {
+            logger.error("Nenhum GroupDTO encontrado para donationId: {}", donationId);
+        } else {
+            logger.info("GroupDTO encontrado: {}", groupDTO);
+        }
+        donationDTO.setGroup(null);
         donationDTO.setAvaliableDate(donation.getAvaliableDate().stream().toList());
         donationDTO.setDonationImage(donation.getDonationImage().getName());
 

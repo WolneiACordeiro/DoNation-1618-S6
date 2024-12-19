@@ -94,7 +94,7 @@ public class DonationServiceImpl implements DonationService {
 
     @Override
     @Transactional(transactionManager = "transactionManager")
-    public DonationRequestDTO createDonationRequest(UUID donationID, String groupName) throws IOException {
+    public DonationRequest createDonationRequest(UUID donationID, String groupName) throws IOException {
         // Obtendo o ID do usuário a partir do JWT
         UUID userId = userService.getUserIdByJwt();
         User user = userRepository.findById(userId)
@@ -111,10 +111,10 @@ public class DonationServiceImpl implements DonationService {
             throw new IllegalStateException("Essa doação não pertence a este grupo");
         }
 
-        DonationRequest donationRequest = donationMapper.toDonationRequest(user, group, donationID);
+        return donationMapper.toDonationRequest(user, group, donationID);
 
-        DonationRequest savedDonation = donationRequestRepository.save(donationRequest);
-
-        return donationMapper.toDonationRequestDTO(savedDonation, donationID);
+//        DonationRequest savedDonation = donationRequestRepository.save(donationRequest);
+//
+//        return donationMapper.toDonationRequestDTO(savedDonation, donationID);
     }
 }

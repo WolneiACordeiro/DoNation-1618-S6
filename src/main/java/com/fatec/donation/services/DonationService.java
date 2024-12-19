@@ -20,6 +20,6 @@ public interface DonationService {
     List<DonationSearchDTO> searchDonation(String groupName, String searchTerm);
 
     @Transactional(transactionManager = "transactionManager")
-    DonationRequestDTO createDonationRequest(UUID donationID, String groupName) throws IOException;
+    DonationRequest createDonationRequest(UUID donationID, String groupName) throws IOException;
 
 }
